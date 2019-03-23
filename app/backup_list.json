@@ -1,0 +1,24 @@
+{
+    "backup":[
+        {
+            "nome":"backup_1",
+            "path":"/home/marcelo/python",
+            "periodo":"diario",
+            "dia_semana":"",
+            "hora_execucao":"17:00",
+            "sc_pre_execucao":"/home/marcelo/python/script_1.py",
+            "sc_pos_execucao":"/home/marcelo/python/script_2.py"
+        },
+        {
+            "nome":"backup_2",
+            "path":"/home/marcelo/backup",
+            "periodo":"semana",
+            "dia_semana":"5",
+            "hora_execucao":"16:00",
+            "sc_pre_execucao":"/home/marcelo/python/script_3.py",
+            "sc_pos_execucao":"/home/marcelo/python/script_4.py"
+
+        }
+
+    ]
+}

@@ -1,0 +1,9 @@
+{
+    "server":[
+        {
+            "host":"localhost",
+            "porta":"5000",
+            "qtd_conecoes":"5"
+        }
+    ]
+}
