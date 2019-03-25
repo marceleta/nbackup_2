@@ -4,7 +4,7 @@ import server
 import backup
 
 
-class Configuracao():
+class Configuracao:
 
     def __init__(self):
         self._set_usuario()

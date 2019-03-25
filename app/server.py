@@ -3,8 +3,9 @@ import selectors
 import logging
 import time
 import threading
-
-logging.basicConfig(filename='nbackup.log', filemode='a', level=logging.INFO, format='[%(asctime)s %(message)s]')
+import controle
+#filename='nbackup.log', filemode='a',
+logging.basicConfig(filename='nbackup.log', filemode='a',level=logging.INFO, format='[%(asctime)s %(message)s]')
 
 class Server():
 
@@ -38,27 +39,6 @@ class Server():
     def qtd_conecoes(self, value):
         self._qtd_conecoes = value
 
-class Conecoes:
-
-    def __init__(self, id, conn):
-        self._id = id
-        self._conn = conn
-
-    @property
-    def id(self):
-        return self._id
-    @id.setter
-    def id(self, id):
-        self._id = id
-
-    @property
-    def conn(self):
-        return self._conn
-
-    @conn.setter
-    def conn(self, conn):
-        self._conn = conn
-
 class SelectorServer:
 
     def __init__(self, host, port, listen):
@@ -74,51 +54,33 @@ class SelectorServer:
                                 data=self.on_accept)
 
         self.current_peers = {}
-        self.conexoes = []
-        self.index = 0
+        self._controle = controle.Controle()
 
 
     def on_accept(self, sock, mask):
-        self.index = self.index + 1
         conn, addr = self.main_socket.accept()
         logging.info('accepted connection from {0}'.format(addr))
         conn.setblocking(False)
 
         self.current_peers[conn.fileno()] = conn.getpeername()
-        conexao = Conecoes(self.index, conn)
-        self.conexoes.append(conexao)
         self.selector.register(fileobj=conn, events=selectors.EVENT_READ,
                                 data=self.on_read)
 
     def on_read(self, conn, mask):
         try:
             data = conn.recv(1024)
-            if data:
+            self._controle.set_data(data)
+
+            if self._controle.is_data():
+                self._controle.processar_mensagem()
                 logging.info('recebi dados de: {}'.format(conn.getpeername()))
+                conn.send(self._controle.enviar_resposta())
             else:
-                self.remove_conn(conn)
                 self.close_connection(conn)
 
         except ConnectionResetError:
-            self.remove_conn(conn)
             self.close_connection(conn)
 
-    def remove_conn(self, conn):
-        for conexao in self.conexoes:
-            if conexao.conn == conn:
-                del self.conexoes[conexao]
-
-    def is_data(self):
-        is_data = False
-
-        for conexao in self.conexoes:
-            data = conexao.conn
-            if data:
-                is_data = True
-            else:
-                is_data = False
-
-        return is_data
 
     def close_connection(self, conn):
 
