@@ -2,6 +2,7 @@ import socket
 import selectors
 import logging
 import time
+import threading
 
 logging.basicConfig(filename='nbackup.log', filemode='a', level=logging.INFO, format='[%(asctime)s %(message)s]')
 
@@ -37,6 +38,27 @@ class Server():
     def qtd_conecoes(self, value):
         self._qtd_conecoes = value
 
+class Conecoes:
+
+    def __init__(self, id, conn):
+        self._id = id
+        self._conn = conn
+
+    @property
+    def id(self):
+        return self._id
+    @id.setter
+    def id(self, id):
+        self._id = id
+
+    @property
+    def conn(self):
+        return self._conn
+
+    @conn.setter
+    def conn(self, conn):
+        self._conn = conn
+
 class SelectorServer:
 
     def __init__(self, host, port, listen):
@@ -52,78 +74,51 @@ class SelectorServer:
                                 data=self.on_accept)
 
         self.current_peers = {}
-        self.current_peer = int()
-        self.data_peers ={}
+        self.conexoes = []
+        self.index = 0
 
 
     def on_accept(self, sock, mask):
+        self.index = self.index + 1
         conn, addr = self.main_socket.accept()
         logging.info('accepted connection from {0}'.format(addr))
         conn.setblocking(False)
 
         self.current_peers[conn.fileno()] = conn.getpeername()
-        self.current_peer = conn.fileno()
-
+        conexao = Conecoes(self.index, conn)
+        self.conexoes.append(conexao)
         self.selector.register(fileobj=conn, events=selectors.EVENT_READ,
                                 data=self.on_read)
 
     def on_read(self, conn, mask):
-
         try:
-            self.data_peers[self.current_peer] = conn.recv(1024)
+            data = conn.recv(1024)
             if data:
-                self.is_data = True
-                peername = conn.getpeername()
-                logging.info('got data from {}: {!r}'.format(peername, data))
-                #conn.send(data)
+                logging.info('recebi dados de: {}'.format(conn.getpeername()))
             else:
+                self.remove_conn(conn)
                 self.close_connection(conn)
 
         except ConnectionResetError:
-                self.close_connection(conn)
+            self.remove_conn(conn)
+            self.close_connection(conn)
 
-    def get_message(self, index=0):
-        print(index)
-        i = int(index)
-        if i == 0:
-            data = self.data_peers[self.current_peer]
-        else:
-            data = self.data_peers[index]
+    def remove_conn(self, conn):
+        for conexao in self.conexoes:
+            if conexao.conn == conn:
+                del self.conexoes[conexao]
 
-        return data.decode('utf-8')
+    def is_data(self):
+        is_data = False
 
-    def delete_data(self, index):
-        i = int(index)
-        if i == 0:
-            data = self.data_peers[self.current_peer]
-        else:
-            data = self.data_peers[index]
-
-        del data[0:]
-
-    def get_is_data(self, index):
-        i = int(index)
-        for data in self.current_peers:
-            if not data:
+        for conexao in self.conexoes:
+            data = conexao.conn
+            if data:
+                is_data = True
+            else:
                 is_data = False
 
         return is_data
-
-
-    def send_message(self, message, index="0", close="False"):
-        i = int(index)
-        c = bool(close)
-        data_bytes = message.encode('utf-8')
-        if i == 0:
-            conn = self.current_peers[self.current_peer]
-            conn.send(data_bytes)
-
-        if close:
-            try:
-                self.close_connection(conn)
-
-            except ConnectionResetError:
-                self.close_connection(conn)
 
     def close_connection(self, conn):
 
@@ -139,11 +134,12 @@ class SelectorServer:
         while True:
 
             events = self.selector.select(timeout=0.2)
+            logging.info('An event occurred')
 
             for key, mask in events:
                 handler = key.data
                 handler(key.fileobj, mask)
-                type(handler)
+
 
             cur_time = time.time()
 
@@ -152,3 +148,8 @@ class SelectorServer:
                 logging.info('Num active peers = {0}'.format(
                                 len(self.current_peers)))
                 last_report_time = cur_time
+
+
+    def run_server(self):
+        self.thread = threading.Thread(target=self.serve_forever)
+        self.thread.start()
