@@ -5,11 +5,12 @@ import json
 class Controle:
 
     def __init__(self):
-        self.fim_conexao = 'fim'
-        self.desligar_servidor = 'exit'
+        self._fim_conexao = 'fim'
+        self._desligar_servidor = 'exit'
         self._mensage = ''
         self._data = bytes()
         self._config = config.Configuracao()
+        self._resposta = ''
 
     def set_data(self, data):
          self._data = data
@@ -29,27 +30,37 @@ class Controle:
 
     def processar_mensagem(self):
         data_json = json.loads(self._data.decode('utf-8'))
-        print(type(data_json))
-        lista = list()
-        print(data_json['comando'])
+        comando = data_json['comando']
 
-        for d in data_json['lista']:
-            lista.append(d)
+        if comando == 'bkp_list':
+            self._resposta = self._lista_backups()
 
-        print('itens lista')
-        for i in lista:
-            print(i)
+        elif comando == 'add_bkp':
+            bkp_para_add = data_json['bkp_list_add']
+            self._resposta = self._add_backup(bkp_para_add)
 
+        elif comando == 'list_bkp_prontos':
+            self._resposta = self._backups_prontos()
 
-        #print(data_json['lista'][0])
-        #print(data_json['lista'][1])
+        elif comando == 'iniciar_ftp':
+            self._resposta = self._iniciar_ftp()
 
-
-
-        #if self._processa_arquivo() == 'backup_list':
-        #    print(self._config.get_backup())
+        else:
+            self._resposta = "comando_nao_encontrado"
 
 
+
+    def _lista_backups(self):
+        return self._config.get_backup()
+
+    def _add_backup(self, lista_para_add):
+        pass
+
+    def _backups_prontos(self):
+        pass
+
+    def _iniciar_ftp(self):
+        pass
 
     def enviar_resposta(self):
-        return 'ok'.encode('utf-8')
+        return self._fim_conexao.encode('utf-8')

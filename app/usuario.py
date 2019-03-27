@@ -21,3 +21,11 @@ class Usuario(object):
     @senha.setter
     def senha(self, value):
         self._senha = value
+
+
+    def is_igual(self, login, senha):
+        is_igual = False
+        if self.login == login and self.senha == senha:
+            is_igual = True
+
+        return is_igual
