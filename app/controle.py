@@ -49,7 +49,6 @@ class Controle:
             self._resposta = "comando_nao_encontrado"
 
 
-
     def _lista_backups(self):
         return self._config.get_backup()
 
@@ -64,3 +63,5 @@ class Controle:
 
     def enviar_resposta(self):
         return self._fim_conexao.encode('utf-8')
+
+    
