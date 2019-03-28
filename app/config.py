@@ -33,14 +33,14 @@ class Configuracao:
     def _set_backup(self):
 
         with open('backup_list.json') as backup_json:
-            self._backup = json.load(backup_json)
-            #b = data['backup']
-            #self._backup_list = []
-            #for i in b:
+            data = json.load(backup_json)
+            b = data['backup']
+            self._backup_list = []
+            for i in b:
             #    self.backup = backup.Backup(i['nome'], i['path'], i['periodo'], i['dia_semana'],
             #                    i['hora_execucao'], i['sc_pre_execucao'], i['sc_pos_execucao'])
-            #    self._backup_list.append(self.backup)
-        print('controle:backup_list: {}'.format(self._backup))
+                self._backup = backup.Backup(i)
+                self._backup_list.append(self._backup)
 
     def get_usuarios(self):
         return self._usuarios
@@ -48,5 +48,5 @@ class Configuracao:
     def get_server_config(self):
         return self._server
 
-    def get_backup(self):
-        return self._backup
+    def get_backups(self):
+        return self._backup_list

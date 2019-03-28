@@ -9,6 +9,5 @@ import server
 config = config.Configuracao()
 config_server = config.get_server_config()
 
-server = server.SelectorServer(config_server.host, config_server.porta,
-                        config_server.qtd_conecoes)
+server = server.SelectorServer('localhost', 5000, 5)
 server.run_server()

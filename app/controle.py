@@ -1,6 +1,8 @@
 
 import config
 import json
+import backup
+import util
 
 class Controle:
 
@@ -10,7 +12,7 @@ class Controle:
         self._mensage = ''
         self._data = bytes()
         self._config = config.Configuracao()
-        self._resposta = ''
+        self._bkp_conversor = backup.Backup_dict()
 
     def set_data(self, data):
          self._data = data
@@ -31,6 +33,7 @@ class Controle:
     def processar_mensagem(self):
         data_json = json.loads(self._data.decode('utf-8'))
         comando = data_json['comando']
+        print('Comando: {}'.format(comando))
 
         if comando == 'bkp_list':
             self._resposta = self._lista_backups()
@@ -50,7 +53,15 @@ class Controle:
 
 
     def _lista_backups(self):
-        return self._config.get_backup()
+        list_backup = self._config.get_backups()
+        size_list = len(list_backup)
+        list_str = []
+        for i in range(size_list):
+            list_str.append(list_backup[i].get_dict())
+
+        backup_json = json.dumps(list_str)
+
+        return backup_json.encode('utf-8')
 
     def _add_backup(self, lista_para_add):
         pass
@@ -62,6 +73,4 @@ class Controle:
         pass
 
     def enviar_resposta(self):
-        return self._fim_conexao.encode('utf-8')
-
-    
+        return self._resposta
