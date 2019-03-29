@@ -26,6 +26,14 @@ class Backup:
         self._dict['nome'] = value
 
     @property
+    def arquivo(self):
+        return self._dict['arquivo']
+
+    @arquivo.setter
+    def arquivo(self, value):
+        self._dict['arquivo'] = value
+
+    @property
     def path(self):
         #return self._path
         return self._dict['path']

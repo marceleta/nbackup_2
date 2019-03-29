@@ -4,6 +4,7 @@ import logging
 import time
 import threading
 import controle
+import sys
 #filename='nbackup.log', filemode='a',
 logging.basicConfig(filename='nbackup.log', filemode='a',level=logging.INFO, format='[%(asctime)s %(message)s]')
 
@@ -55,6 +56,7 @@ class SelectorServer:
 
         self.current_peers = {}
         self._controle = controle.Controle()
+        self._server_on_running = True
 
 
     def on_accept(self, sock, mask):
@@ -75,12 +77,19 @@ class SelectorServer:
                 self._controle.processar_mensagem()
                 logging.info('recebi dados de: {}'.format(conn.getpeername()))
                 conn.send(self._controle.enviar_resposta())
+                if not self._controle.get_running():
+                    self._set_is_running(self._controle.get_running(), conn)
             else:
                 self.close_connection(conn)
 
         except ConnectionResetError:
             self.close_connection(conn)
 
+
+    def _set_is_running(self, is_running,conn):
+        self._server_on_running = is_running
+        self.selector.close()
+        sys.exit()
 
     def close_connection(self, conn):
 
@@ -92,11 +101,10 @@ class SelectorServer:
 
     def serve_forever(self):
         last_report_time = time.time()
-
-        while True:
+        logging.info('Iniciando servidor')
+        while self._server_on_running:
 
             events = self.selector.select(timeout=0.2)
-            logging.info('An event occurred')
 
             for key, mask in events:
                 handler = key.data

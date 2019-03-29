@@ -2,15 +2,17 @@
     "backup":[
         {
             "nome":"backup_1",
+            "arquivo": "nome_arquivo.dump",
             "path":"/home/marcelo/python",
             "periodo":"diario",
             "dia_semana":"",
-            "hora_execucao":"17:00",
+            "hora_execucao":["8:00","15:00","18:00"],
             "sc_pre_execucao":"/home/marcelo/python/script_1.py",
             "sc_pos_execucao":"/home/marcelo/python/script_2.py"
         },
         {
             "nome":"backup_2",
+            "arquivo":"nome_arquivo",
             "path":"/home/marcelo/backup",
             "periodo":"semana",
             "dia_semana":"5",

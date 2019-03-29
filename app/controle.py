@@ -8,11 +8,13 @@ class Controle:
 
     def __init__(self):
         self._fim_conexao = 'fim'
-        self._desligar_servidor = 'exit'
+        self._desligar_servidor = 'desligar_servidor'
+        self._cmd_desligar = False
         self._mensage = ''
         self._data = bytes()
         self._config = config.Configuracao()
         self._bkp_conversor = backup.Backup_dict()
+
 
     def set_data(self, data):
          self._data = data
@@ -48,8 +50,12 @@ class Controle:
         elif comando == 'iniciar_ftp':
             self._resposta = self._iniciar_ftp()
 
+        elif comando == self._desligar_servidor:
+            self._resposta = self.get_shutdown()
+            self._cmd_desligar = True
+
         else:
-            self._resposta = "comando_nao_encontrado"
+            self._resposta == "comando_nao_encontrado"
 
 
     def _lista_backups(self):
@@ -71,6 +77,14 @@ class Controle:
 
     def _iniciar_ftp(self):
         pass
+
+    def get_shutdown(self):
+        return 'desligando'.encode('utf-8')
+
+    def get_running(self):
+
+        print(not self._cmd_desligar)
+        return not self._cmd_desligar
 
     def enviar_resposta(self):
         return self._resposta
