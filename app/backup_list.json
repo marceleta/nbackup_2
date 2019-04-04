@@ -7,6 +7,7 @@
             "periodo":"diario",
             "dia_semana":"",
             "hora_execucao":["8:00","15:00","18:00"],
+            "sc_backup":"/home/marcelo/python/exec_backup.bat",
             "sc_pre_execucao":"/home/marcelo/python/script_1.py",
             "sc_pos_execucao":"/home/marcelo/python/script_2.py"
         },
@@ -16,7 +17,20 @@
             "path":"/home/marcelo/backup",
             "periodo":"semana",
             "dia_semana":"5",
-            "hora_execucao":"16:00",
+            "hora_execucao":["16:00"],
+            "sc_backup":"/home/marcelo/python/exec_backup.bat",
+            "sc_pre_execucao":"/home/marcelo/python/script_3.py",
+            "sc_pos_execucao":"/home/marcelo/python/script_4.py"
+
+        },
+        {
+            "nome":"backup_3",
+            "arquivo":"nome_arquivo",
+            "path":"/home/marcelo/backup",
+            "periodo":"semana",
+            "dia_semana":"5",
+            "hora_execucao":["14:30"],
+            "sc_backup":"/home/marcelo/python/exec_backup.bat",
             "sc_pre_execucao":"/home/marcelo/python/script_3.py",
             "sc_pos_execucao":"/home/marcelo/python/script_4.py"
 

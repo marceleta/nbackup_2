@@ -98,6 +98,14 @@ class Backup:
         #self._sc_pos_execucao = value
         self._dict['sc_pos_execucao'] = value
 
+    @property
+    def sc_backup(self):
+        return self._dict['sc_backup']
+
+    @sc_backup.setter
+    def sc_backup(self, value):
+        self._dict['sc_backup'] = value
+
     def get_dict(self):
         return self._dict
 

@@ -2,9 +2,20 @@ import datetime
 import backup
 import arquivo
 import sys
+from config import Configuracao
 from abc import ABC, abstractmethod
+import subprocess
 
 class Template_servico(object):
+    dia_semana = [
+        segunda,
+        terca,
+        quarta,
+        quinta,
+        sexta,
+        sabado,
+        domingo
+    ]
 
     bkp_diario = 'diario'
     bkp_semanal = 'semanal'
@@ -22,17 +33,28 @@ class Template_servico(object):
 
     @abstractmethod
     def is_hora_exec(self):
+        pass
+
+    def hora_para_minutos(self, hora):
+        temp = datetime.time(hour=hora.hour, minute=hora.minute)
+        minutos = (temp.hora)*60 + (temp.minute)
+
+        return minutos
 
     @abstractmethod
-    def executar(self):
+    def executar(self, backup):
         pass
 
     @abstractmethod
-    def executa_sc_pre(self):
+    def executa_sc_pre(self, backup):
         pass
 
     @abstractmethod
     def executa_sc_pos(self):
+        pass
+
+    @abstractmethod
+    def executa_backup(self, backup):
         pass
 
     @abstractmethod
@@ -49,47 +71,69 @@ class Template_servico(object):
 
 
 
-class Servico(Template_servico):
-    dia_semana = [
-        segunda,
-        terca,
-        quarta,
-        quinta,
-        sexta,
-        sabado,
-        domingo
-    ]
+class Servico_diario(Template_servico):
+
 
     def __init__(self, backup):
         super.__init__(backup)
         self._backup = backup
 
-
     def verifica_execucao(self):
+        is_executar = False
+        lista_horario = self._backup['backup']['hora_execucao']
 
-        if
+        for str_hora in lista_horario:
+            _hora = self._conv_hora(str_hora)
 
-    def executar(self):
+            if self._is_hora_exec(_hora):
+                is_executar = True
 
+        return is_executar
 
+    def executar(self, backup):
+        pass
+
+    def executa_sc_pre(self, backup):
+        execucao = 'OK'
+        str_sc = backup['sc_pre_execucao']
+        if str_sc == '':
+            process = subprocess.Popen(str_sc, shell=True, stdout=subprocess.PIPE)
+            output, erro = process.communicate()
+            if erro == None:
+                execucao = 'ERRO'
+
+        return execucao
+
+    def executa_sc_pos(self, backup):
+        execucao = 'OK'
+        str_sc =backup['sc_pos_execucao']
+        if str_sc == '':
+            process = subprocess.Popen(str_sc, shell=True, stdout=subprocess.PIPE)
+            output, erro = process.communicate()
+            if erro == None:
+                execucao = 'ERRO'
+
+        return execucao
+
+    def executa_backup(self, backup):
+        execucao = 'OK'
+        str_sc = backup['sc_backup']
+        if str_sc == '':
+            processo = subprocess.Popen(str_sc, shell=True, stdout=subprocess.PIPE)
+            output, erro = processo.communicate()
+            if erro == None:
+                execucao = 'ERRO'
+
+        return execucao
 
     def _is_hora_exec(self, hora):
-        is_hora_exec = False
+        t = datetime.datetime.now()
+        minutes_now = super.hora_para_minutos(t)
 
-        agora = datetime.datetime.now()
-        agora_minute = int(agora.hour)*60 + int(agora.minute)
+        minutes_bkp = super.hora_para_minutos(hora)
 
-        bhora = self._conv_hora(hora)
-        bhora_minute = int(bhora.hour)*60 + int(bhora.minute)
-
-        print("agora_minute: {}".format(agora_minute))
-        print("bhora_minute: {}".format(bhora_minute))
-
-        if bhora_minute > agora_minute:
-            is_hora_exec = True
-
-        return is_hora_exec
+        return (minutes_now >= minutes_bkp)
 
 
     def _conv_hora(self, hora):
-        return datetime.datetime.strftime(data, '%H:%M')
+        return datetime.datetime.strftime(hora, '%H:%M')

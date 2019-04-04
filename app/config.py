@@ -2,6 +2,7 @@ import json
 import usuario
 import server
 import backup
+import platform
 
 
 class Configuracao:
@@ -41,6 +42,11 @@ class Configuracao:
             #                    i['hora_execucao'], i['sc_pre_execucao'], i['sc_pos_execucao'])
                 self._backup = backup.Backup(i)
                 self._backup_list.append(self._backup)
+
+
+    @staticmethod
+    def os_system(self):
+        return platform.system()
 
     def get_usuarios(self):
         return self._usuarios
