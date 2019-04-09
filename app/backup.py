@@ -1,16 +1,27 @@
 import datetime
 
 class Backup:
-    #def __init__(self,nome, path, periodo, dia_semana, hora_execucao,
-    #                sc_pre_execucao, sc_pos_execucao):
-    #
-    #    self._nome = nome
-    #    self._path = path
-    #    self._periodo = periodo
-    #    self._dia_semana = dia_semana
-    #    self._hora_execucao = hora_execucao
-    #    self._sc_pre_execucao = sc_pre_execucao
-    #    self._sc_pos_execucao = sc_pos_execucao
+
+    dia_semana = [
+        'segunda',
+        'terca',
+        'quarta',
+        'quinta',
+        'sexta',
+        'sabado',
+        'domingo'
+    ]
+
+    periodo {
+        "bkp_diario":"diario",
+        "bkp_semanal":"semanal",
+        "bkp_mensal":"mensal"
+    }
+
+    tipo {
+        "arquivo":"arquivo",
+        "diretorio":"diretorio"
+    }
 
     def __init__(self, dict):
         self._dict = dict
@@ -26,22 +37,30 @@ class Backup:
         self._dict['nome'] = value
 
     @property
-    def arquivo(self):
-        return self._dict['arquivo']
+    def fonte(self):
+        return self._dict['fonte']
 
-    @arquivo.setter
-    def arquivo(self, value):
-        self._dict['arquivo'] = value
+    @fonte.setter
+    def fonte(self, value):
+        self._dict['fonte'] = value
 
     @property
-    def path(self):
+    def path_origem(self):
         #return self._path
-        return self._dict['path']
+        return self._dict['path_origem']
 
     @path.setter
-    def path(self, value):
+    def path_origem(self, value):
         #self._path = value
-        self._dict['path'] = value
+        self._dict['path_origem'] = value
+
+    @property
+    def path_destino(self):
+        return sefl._dict['path_destino']
+
+    @path_destino.setter
+    def path_destino(self, value):
+        self._dict['path_destino'] = value
 
     @property
     def periodo(self):
@@ -108,6 +127,15 @@ class Backup:
 
     def get_dict(self):
         return self._dict
+
+    @property
+    def backup_auto(self):
+        return self._dict['backup_auto']
+
+    @backup_auto.setter
+    def backup_auto(self, value):
+        self._dict['backup_auto'] = value
+
 
 
 class Backup_dict:

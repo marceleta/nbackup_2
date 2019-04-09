@@ -2,7 +2,10 @@
 import config
 import json
 import backup
+import servico
 import util
+import threading
+import time
 
 class Controle:
 
@@ -14,6 +17,7 @@ class Controle:
         self._data = bytes()
         self._config = config.Configuracao()
         self._bkp_conversor = backup.Backup_dict()
+        self._thread_servico = True
 
 
     def set_data(self, data):
@@ -77,6 +81,34 @@ class Controle:
 
     def _iniciar_ftp(self):
         pass
+
+    def _iniciar_thread_servicos(self):
+        self._thread_servico = True
+        thread = threading.Thread(target=self._verifica_servicos)
+        thread.start()
+
+    def _verifica_servicos(self):
+        while self._thread_servico:
+            for servico in self._criar_lista_servicos():
+                if servico.verifica_execucao():
+                    self._exec_serv_thread(servico)
+            time.sleep(1000)
+
+    def _exec_serv_thread(self, servico):
+        thread = threading.Thread(target=servico.executar())
+        thread.start()
+
+
+    def _criar_lista_servicos(self):
+        lista_backup =self._config.get_backups()
+        lista_servico = []
+        for backup in lista_backup:
+            if backup.periodo == 'diario':
+                servico_diario = servico.Servico_diario(backup)
+                lista_servico.append(servico_diario)
+
+        return lista_servico
+
 
     def get_shutdown(self):
         return 'desligando'.encode('utf-8')

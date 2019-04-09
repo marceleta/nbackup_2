@@ -1,8 +1,9 @@
 
 class Arquivo:
 
-    def __init__(self, nome=None, hash_verificacao=None, data_criacao=None):
+    def __init__(self, nome, path, hash_verificacao, data_criacao):
         self._nome = nome
+        self._path = path
         self._hash_verificacao = hash_verificacao
         self._data_criacao = data_criacao
 
@@ -13,6 +14,15 @@ class Arquivo:
     @nome.setter
     def nome(self, value):
         self._nome = nome
+
+    @property
+    def path(self):
+        return self._path
+
+    @path.setter
+    def path(self, value):
+        self._path = value
+        
     @property
     def hash_verificacao(self):
         return self._hash_verificacao
