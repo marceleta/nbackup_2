@@ -17,7 +17,16 @@ class Controle:
         self._data = bytes()
         self._config = config.Configuracao()
         self._bkp_conversor = backup.Backup_dict()
-        self._thread_servico = True
+        self._loop_controle = True
+        self._thread_servico = {}
+        self._thread_controle = {}
+        self._threads_finalizados = {}
+        self._lista_bkp_executando = []
+        self._verifica_servico = 'Verifica servicos'
+        self._threads_ativos = 'Threads ativos'
+        self._reg_serv_finalizados = 'Registra servicos'
+
+        self._iniciar_thread_controle()
 
 
     def set_data(self, data):
@@ -82,32 +91,90 @@ class Controle:
     def _iniciar_ftp(self):
         pass
 
-    def _iniciar_thread_servicos(self):
-        self._thread_servico = True
-        thread = threading.Thread(target=self._verifica_servicos)
-        thread.start()
+    def _iniciar_thread_controle(self):
+        self._loop_controle = True
+
+        thread_verificacao = threading.Thread(target=self._verifica_servicos, name=self._verifica_servico)
+        self._thread_controle[self._verifica_servico] = thread_verificacao
+        thread_verificacao.start()
+
+        thread_ativos = threading.Thread(target=self._verifica_thread_ativos, name=self._threads_ativos)
+        self._thread_controle[self._threads_ativos] = thread_ativos
+        thread_ativos.start()
+
+        thread_reg_finalizado = threading.Thread(target=self._registar_servicos_finalizados, name=self._reg_serv_finalizados)
+        self._thread_controle[self._reg_serv_finalizados] = thread_reg_finalizado
+        thread_reg_finalizado.start()
 
     def _verifica_servicos(self):
-        while self._thread_servico:
-            for servico in self._criar_lista_servicos():
+        dict_servicos = self._criar_servicos_diario()
+        while self._loop_controle:
+            lista_nome_servicos = list(dict_servicos.keys())
+            for key in lista_nome_servicos:
+                servico = dict_servicos[key]
                 if servico.verifica_execucao():
-                    self._exec_serv_thread(servico)
-            time.sleep(1000)
+                    self._add_servico_thread(servico)
+                    del dict_servicos[key]
 
-    def _exec_serv_thread(self, servico):
-        thread = threading.Thread(target=servico.executar())
+            time.sleep(60)
+
+    def _add_servico_thread(self, serv):
+        thread = servico.ServicoThread(serv)
+        self._thread_servico[serv.get_nome()] = thread
+        thread.set_inicio_thread(time.time())
         thread.start()
 
+    def _verifica_thread_ativos(self):
+        while self._loop_controle:
+            lista_thread_ativos = list(self._thread_servico.keys())
+            for key in lista_thread_ativos:
+                thread = self._thread_servico.get(key)
+                if not thread.is_alive():
+                    thread.set_final_thread(time.time())
+                    self._threads_finalizados[thread.get_nome()] = thread
+                    del self._thread_servico[key]
 
-    def _criar_lista_servicos(self):
+            time.sleep(60)
+
+    def _registar_servicos_finalizados(self):
+        # Registar no banco de dados
+        #testar ate aqui
+        while self._loop_controle:
+            lista_finalizados = list(self._threads_finalizados.keys())
+            for key in lista_finalizados:
+                thread = self._threads_finalizados[key]
+                print('Nome servico: {}'.format(thread.get_nome()))
+                print('Delta time: {}'.format(thread.get_final_thread() - thread.get_inicio_thread()))
+                print('Resultado execucao: {}'.format(thread.get_resultado()))
+                servico = thread.get_servico()
+                print('backup existe? {}'.format(servico.verifica_backup_existe()))
+                arquivo = servico.get_info_arquivo_backup()
+                print('Arquivo nome: {}'.format(arquivo.nome))
+                print('Arquivo path: {}'.format(arquivo.path))
+                print('Arquivo md5: {}'.format(arquivo.hash_verificacao))
+                print('Arquivo data_criacao: {}'.format(arquivo.data_criacao))
+
+                del self._threads_finalizados[key]
+
+            time.sleep(60)
+
+
+
+
+    #def _exec_serv_thread(self, servico):
+    #    thread = threading.Thread(target=servico.executar())
+    #    thread.start()
+
+
+    def _criar_servicos_diario(self):
         lista_backup =self._config.get_backups()
-        lista_servico = []
+        self._dict_servicos = {}
         for backup in lista_backup:
             if backup.periodo == 'diario':
                 servico_diario = servico.Servico_diario(backup)
-                lista_servico.append(servico_diario)
+                self._dict_servicos[backup.nome] = servico_diario
 
-        return lista_servico
+        return self._dict_servicos
 
 
     def get_shutdown(self):

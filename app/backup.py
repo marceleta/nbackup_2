@@ -12,13 +12,13 @@ class Backup:
         'domingo'
     ]
 
-    periodo {
+    periodo = {
         "bkp_diario":"diario",
         "bkp_semanal":"semanal",
         "bkp_mensal":"mensal"
     }
 
-    tipo {
+    tipo = {
         "arquivo":"arquivo",
         "diretorio":"diretorio"
     }
@@ -49,14 +49,14 @@ class Backup:
         #return self._path
         return self._dict['path_origem']
 
-    @path.setter
+    @path_origem.setter
     def path_origem(self, value):
         #self._path = value
         self._dict['path_origem'] = value
 
     @property
     def path_destino(self):
-        return sefl._dict['path_destino']
+        return self._dict['path_destino']
 
     @path_destino.setter
     def path_destino(self, value):

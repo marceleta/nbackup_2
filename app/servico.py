@@ -4,10 +4,12 @@ import backup_zip
 import arquivo
 import util
 import sys
-from config import Configuracao
+import config
 from abc import ABC, abstractmethod
 import subprocess
 import os, stat, time
+import threading
+from threading import Thread
 
 class Template_servico(object):
 
@@ -61,41 +63,88 @@ class Template_servico(object):
         pass
 
     @abstractmethod
-    def get_arquivo_backup():
+    def get_info_arquivo_backup():
         pass
 
+class ServicoThread(Thread):
+    def __init__(self, servico):
+        Thread.__init__(self, name=servico.get_nome())
+        self._servico = servico
+        self._inicio = None
+        self._final = None
+        self._resultado = None
+
+        def run():
+            self._resultado = self._servico.executar()
+
+    def get_resultado(self):
+        '''
+        Retorna None se não houver resultado,
+        retorna um dict caso haja um resultado
+        '''
+        self._resultado
 
 
-class Servico_diario(Template_servico):
+    def get_nome(self):
+        return self._servico.get_nome()
 
+    def get_servico(self):
+        return self._servico
+
+    def set_inicio_thread(self, inicio):
+        self._inicio = inicio
+
+    def get_inicio_thread(self):
+        return self._inicio
+
+    def set_final_thread(self, final):
+        self._final = final
+
+    def get_final_thread(self):
+        return self._final
+
+class Servico_diario:
 
     def __init__(self, backup):
-        super.__init__(backup)
         self._backup = backup
-        self._config = Configuracao()
+        self._config = config.Configuracao()
+
+    def get_nome(self):
+        return self._backup.nome
 
 
     def verifica_execucao(self):
         is_executar = False
-        lista_horario = self._backup['backup']['hora_execucao']
+        lista_horario = self._backup.hora_execucao
 
         for str_hora in lista_horario:
             _hora = self._conv_hora(str_hora)
             if self._is_hora_exec(_hora):
                 self._hora_execucao = str_hora
+                print('hora_execucao: {}'.format(self._hora_execucao))
                 is_executar = True
 
 
         return is_executar
 
     def executar(self):
-        self.executa_sc_pre()
+        dict_resultado = {}
+
+        resultado = self.executa_sc_pre()
+        dict_resultado['executa_sc_pre'] = resultado
+
         if self._backup.backup_auto == 'Sim':
-            self.executa_sc_backup()
+            resultado = self.executa_sc_backup()
+            dict_resultado['executa_backup_auto'] = resultado
         else:
-            self.executa_sc_nativo()
-        self.executa_sc_pos()
-        self.gerar_resposta()
+            resultado = self.executa_sc_nativo()
+            dict_resultado['executa_sc_nativo'] = resultado
+
+        resultado = self.executa_sc_pos()
+        dict_resultado['executa_sc_pos'] = resultado
+
+        return dict_resultado
+
 
     def executa_sc_pre(self):
         execucao = 'OK'
@@ -103,7 +152,7 @@ class Servico_diario(Template_servico):
         if str_sc == '':
             process = subprocess.Popen(str_sc, shell=True, stdout=subprocess.PIPE)
             output, erro = process.communicate()
-            if erro not None:
+            if erro == None:
                 execucao = 'ERRO'
 
         return execucao
@@ -114,7 +163,7 @@ class Servico_diario(Template_servico):
         if str_sc == '':
             process = subprocess.Popen(str_sc, shell=True, stdout=subprocess.PIPE)
             output, erro = process.communicate()
-            if erro not None:
+            if erro == None:
                 execucao = 'ERRO'
 
         return execucao
@@ -125,7 +174,7 @@ class Servico_diario(Template_servico):
         if str_sc == '':
             processo = subprocess.Popen(str_sc, shell=True, stdout=subprocess.PIPE)
             output, erro = processo.communicate()
-            if erro not None:
+            if erro == None:
                 execucao = 'ERRO'
 
         return execucao
@@ -144,7 +193,6 @@ class Servico_diario(Template_servico):
 
 
     def verifica_backup_existe(self):
-
         '''
         verifica se o backup foi criado e a data de criacao
         '''
@@ -163,7 +211,7 @@ class Servico_diario(Template_servico):
 
         return backup_existe
 
-    def get_arquivo_backup(self):
+    def get_info_arquivo_backup(self):
         '''
         Gerar a resposta com as definições do arquivo: md5, tamanho e data criação para resposta
         '''
@@ -203,19 +251,25 @@ class Servico_diario(Template_servico):
 
     def _get_format_nome(self):
         nome_arquivo = self._backup.nome
-        posfixo = backup.Backup.dia_semana[datetime.datetime.today().weekday()] + "_" + self._hora_execucao.replace(':','')
+        print('hora_execucao: {}'.format(self._hora_execucao))
+        posfixo = backup.Backup.dia_semana[datetime.datetime.today().weekday()] + '_' + self._hora_execucao.replace(':','')
         nome_completo = nome_arquivo + posfixo + '.zip'
 
         return nome_completo
 
     def _is_hora_exec(self, hora):
         t = datetime.datetime.now()
-        minutes_now = super.hora_para_minutos(t)
+        minutes_now = self._hora_para_minutos(t)
 
-        minutes_bkp = super.hora_para_minutos(hora)
+        minutes_bkp = self._hora_para_minutos(hora)
 
         return (minutes_now >= minutes_bkp)
 
+    def _hora_para_minutos(self, hora):
+        temp = datetime.time(hour=hora.hour, minute=hora.minute)
+        minutos = (temp.hour)*60 + (temp.minute)
+
+        return minutos
 
     def _conv_hora(self, hora):
-        return datetime.datetime.strftime(hora, '%H:%M')
+        return datetime.datetime.strptime(hora, '%H:%M')

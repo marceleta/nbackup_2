@@ -45,7 +45,7 @@ class Configuracao:
 
 
     @staticmethod
-    def os_system(self):
+    def os_system():
         return platform.system()
 
     def get_usuarios(self):

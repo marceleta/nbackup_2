@@ -22,13 +22,13 @@ class Arquivo:
     @path.setter
     def path(self, value):
         self._path = value
-        
+
     @property
     def hash_verificacao(self):
         return self._hash_verificacao
 
     @hash_verificacao.setter
-    def hash_verificacao(self, value)
+    def hash_verificacao(self, value):
         self._hash_verificacao = value
 
     @property

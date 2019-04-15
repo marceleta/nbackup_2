@@ -2,45 +2,17 @@
     "backup":[
         {
             "nome":"backup_1",
-            "backup_auto":"Nao"
-            "path_origem":"/home/marcelo/python",
+            "backup_auto":"Nao",
+            "path_origem":"/home/marcelo/ISO",
             "path_destino":"/home/marcelo/backup",
             "tipo":"arquivo",
-            "fonte": "nome_arquivo.dump",
+            "fonte": "hirens-bootcd-15-2-es-en-win.zip",
             "periodo":"diario",
             "dia_semana":"",
-            "hora_execucao":["18:00"],
+            "hora_execucao":["17:25"],
             "sc_backup":"/home/marcelo/python/exec_backup.bat",
             "sc_pre_execucao":"/home/marcelo/python/script_1.py",
             "sc_pos_execucao":"/home/marcelo/python/script_2.py"
-        },
-        {
-            "nome":"backup_2",
-            "backup_auto":"Nao"
-            "path":"/home/marcelo/backup",
-            "tipo":"diretorio",
-            "fonte":"",
-            "periodo":"semana",
-            "dia_semana":"5",
-            "hora_execucao":["16:00"],
-            "sc_backup":"/home/marcelo/python/exec_backup.bat",
-            "sc_pre_execucao":"/home/marcelo/python/script_3.py",
-            "sc_pos_execucao":"/home/marcelo/python/script_4.py"
-
-        },
-        {
-            "nome":"backup_3",
-            "backup_auto":"Sim"
-            "path":"/home/marcelo/backup",
-            "tipo":"diretorio",
-            "arquivo":"",
-            "periodo":"semana",
-            "dia_semana":"6",
-            "hora_execucao":["15:20"],
-            "sc_backup":"/home/marcelo/python/exec_backup.bat",
-            "sc_pre_execucao":"/home/marcelo/python/script_3.py",
-            "sc_pos_execucao":"/home/marcelo/python/script_4.py"
-
         }
 
     ]
