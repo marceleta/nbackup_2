@@ -115,7 +115,20 @@ class Servico_diario:
 
     def verifica_execucao(self):
         is_executar = False
-        lista_horario = self._backup.hora_execucao
+        hora_executar = self._backup.hora_execucao
+
+        #converte str hora para datetime hora
+        _hora_executar = self._conv_hora(hora_executar)
+        #verifica se e a hora e maior ou menor
+        if self._is_hora_exec(_hora_executar):
+            is_executar = True
+
+        return is_executar
+
+
+        '''
+        is_executar = False
+        horario = self._backup.hora_execucao
 
         for str_hora in lista_horario:
             _hora = self._conv_hora(str_hora)
@@ -126,6 +139,7 @@ class Servico_diario:
 
 
         return is_executar
+        '''
 
     def executar(self):
         dict_resultado = {}
@@ -148,7 +162,7 @@ class Servico_diario:
 
     def executa_sc_pre(self):
         execucao = 'OK'
-        str_sc = self._backup.sc_sc_execucao
+        str_sc = self._backup.sc_pre_execucao
         if str_sc == '':
             process = subprocess.Popen(str_sc, shell=True, stdout=subprocess.PIPE)
             output, erro = process.communicate()
@@ -186,10 +200,10 @@ class Servico_diario:
         else:
             path_origem = self._backup.path_origem
 
-        backup_zip = backup_zip.Backup_zip(self._backup.tipo, path_origem,
-                                            self._get_path_abs_backup, self._config.os_system())
+        self.backup_zip = backup_zip.Backup_zip(self._backup.tipo, path_origem,
+                                            self._get_path_abs_backup(), self._config.os_system())
 
-        backup_zip.zip_backup()
+        self.backup_zip.zip_backup()
 
 
     def verifica_backup_existe(self):
@@ -236,9 +250,9 @@ class Servico_diario:
     def _get_path_abs_backup(self):
 
         if self._config.os_system() == 'Windows':
-            path = self._backup.path_destino + "\\" + self._get_format_nome()
+            path = self._backup.path_destino + '\\' + self._get_format_nome()
         else:
-            path = self._backup.path_destino + "/" + self._get_format_nome()
+            path = self._backup.path_destino + '/' + self._get_format_nome()
 
         return path
 
@@ -249,11 +263,12 @@ class Servico_diario:
         else:
             path = self._backup.path_origem + '/' + self._backup.fonte
 
+        return path
+
     def _get_format_nome(self):
         nome_arquivo = self._backup.nome
-        print('hora_execucao: {}'.format(self._hora_execucao))
-        posfixo = backup.Backup.dia_semana[datetime.datetime.today().weekday()] + '_' + self._hora_execucao.replace(':','')
-        nome_completo = nome_arquivo + posfixo + '.zip'
+        posfixo = backup.Backup.dict_dia_semana[datetime.datetime.today().weekday()] + '_' + self._backup.hora_execucao.replace(':','')
+        nome_completo = nome_arquivo + '_' + posfixo + '.zip'
 
         return nome_completo
 

@@ -2,7 +2,7 @@ import datetime
 
 class Backup:
 
-    dia_semana = [
+    dict_dia_semana = [
         'segunda',
         'terca',
         'quarta',
@@ -11,17 +11,6 @@ class Backup:
         'sabado',
         'domingo'
     ]
-
-    periodo = {
-        "bkp_diario":"diario",
-        "bkp_semanal":"semanal",
-        "bkp_mensal":"mensal"
-    }
-
-    tipo = {
-        "arquivo":"arquivo",
-        "diretorio":"diretorio"
-    }
 
     def __init__(self, dict):
         self._dict = dict
@@ -35,6 +24,14 @@ class Backup:
     def nome(self, value):
         #self._nome = value
         self._dict['nome'] = value
+
+    @property
+    def tipo(self):
+        return self._dict['tipo']
+
+    @tipo.setter
+    def tipo(self, value):
+        self._dict['tipo'] = value
 
     @property
     def fonte(self):
@@ -74,8 +71,7 @@ class Backup:
 
     @property
     def dia_semana(self):
-        #return self._format_hora(self._dia_semana)
-        return self._format_hora(self._dict['dia_semana'])
+        return self._dict['dia_semana']
 
     @dia_semana.setter
     def dia_semana(self, value):

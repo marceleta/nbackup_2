@@ -11,9 +11,8 @@ class Backup_zip:
         '''
         Definições:
         tipo = arquivo ou _zip_diretorio
-        path = path absoluto do diretorio ou arquivo para backup
-        posfixo = anexo ao nome do backup(segunda, terca, ...) + a hora da execucao
-        nome_backup = nome final do arquivo a ser gerado o zip com o path
+        path_origem = path absoluto do diretorio ou arquivo para backup
+        path_destino = nome final do arquivo a ser gerado o zip com o path
         os = sistema operacional
         '''
         self._tipo = tipo
@@ -21,7 +20,7 @@ class Backup_zip:
         self._path_destino = path_destino
         self._os = os
 
-    def zip_backup():
+    def zip_backup(self):
         if self._tipo == 'arquivo':
             self._zip_arquivo()
         else:
@@ -30,10 +29,9 @@ class Backup_zip:
 
 
     def _zip_arquivo(self):
-
-        with zipfile.ZipFile(self._path_destino, 'r') is new_zip:
+        with zipfile.ZipFile(self._path_destino, 'w') as new_zip:
             new_zip.write(self._path_origem)
-
+            
 
     def _zip_diretorio(self):
         lista_arquivos = []
@@ -41,9 +39,9 @@ class Backup_zip:
             for file_name in files:
                 lista_arquivos.append(file_name)
 
-            with zipfile.ZipFile(self._path_destino, 'r') is new_zip:
+            with zipfile.ZipFile(self._path_destino, 'w') as new_zip:
                 for file in lista_arquivos:
-                    if os == 'Windows':
+                    if self._os == 'Windows':
                         arquivo = self._path_origem + '\\'+ file
                     else:
                         arquivo =self._path_origem + '/' + file

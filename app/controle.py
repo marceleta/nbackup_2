@@ -129,6 +129,10 @@ class Controle:
             lista_thread_ativos = list(self._thread_servico.keys())
             for key in lista_thread_ativos:
                 thread = self._thread_servico.get(key)
+                print('------verifica threads------')
+                print('nome: {}'.format(thread.get_nome()))
+                print('is_alive: {}'.format(thread.is_alive()))
+                print('----------------------------')
                 if not thread.is_alive():
                     thread.set_final_thread(time.time())
                     self._threads_finalizados[thread.get_nome()] = thread
@@ -137,6 +141,8 @@ class Controle:
             time.sleep(60)
 
     def _registar_servicos_finalizados(self):
+        print('registrar servicos finalizados')
+        '''
         # Registar no banco de dados
         #testar ate aqui
         while self._loop_controle:
@@ -157,7 +163,7 @@ class Controle:
                 del self._threads_finalizados[key]
 
             time.sleep(60)
-
+        '''
 
 
 
