@@ -108,8 +108,10 @@ class Controle:
 
     def _verifica_servicos(self):
         dict_servicos = self._criar_servicos_diario()
+        print('dict_servicos: {}'.format(dict_servicos))
         while self._loop_controle:
             lista_nome_servicos = list(dict_servicos.keys())
+            print('Lista nome servicos: {}'.format(lista_nome_servicos))
             for key in lista_nome_servicos:
                 servico = dict_servicos[key]
                 if servico.verifica_execucao():
@@ -127,12 +129,11 @@ class Controle:
     def _verifica_thread_ativos(self):
         while self._loop_controle:
             lista_thread_ativos = list(self._thread_servico.keys())
+            print('lista_thread_ativos: {}'.format(lista_thread_ativos))
             for key in lista_thread_ativos:
                 thread = self._thread_servico.get(key)
-                print('------verifica threads------')
-                print('nome: {}'.format(thread.get_nome()))
-                print('is_alive: {}'.format(thread.is_alive()))
-                print('----------------------------')
+                print('verifica thread: {}'.format(thread.name))
+                print('thread.is_alive: {}'.format(thread.is_alive()))
                 if not thread.is_alive():
                     thread.set_final_thread(time.time())
                     self._threads_finalizados[thread.get_nome()] = thread
@@ -141,18 +142,24 @@ class Controle:
             time.sleep(60)
 
     def _registar_servicos_finalizados(self):
-        print('registrar servicos finalizados')
         '''
+        while self._loop_controle:
+            print('registrar servicos finalizados')
+            print('thread finalizados: {}'.format(self._threads_finalizados))
+            time.sleep(60)
+        '''
+
         # Registar no banco de dados
         #testar ate aqui
         while self._loop_controle:
             lista_finalizados = list(self._threads_finalizados.keys())
+            print('lista_finalizados: {}'.format(lista_finalizados))
             for key in lista_finalizados:
                 thread = self._threads_finalizados[key]
+                servico = thread.get_servico()
                 print('Nome servico: {}'.format(thread.get_nome()))
                 print('Delta time: {}'.format(thread.get_final_thread() - thread.get_inicio_thread()))
-                print('Resultado execucao: {}'.format(thread.get_resultado()))
-                servico = thread.get_servico()
+                print('Resultado execucao: {}'.format(servico.get_resultado()))
                 print('backup existe? {}'.format(servico.verifica_backup_existe()))
                 arquivo = servico.get_info_arquivo_backup()
                 print('Arquivo nome: {}'.format(arquivo.nome))
@@ -163,7 +170,7 @@ class Controle:
                 del self._threads_finalizados[key]
 
             time.sleep(60)
-        '''
+
 
 
 

@@ -68,22 +68,15 @@ class Template_servico(object):
 
 class ServicoThread(Thread):
     def __init__(self, servico):
+        #Thread.__init__(self, target=servico.executar(), name=servico.get_nome())
         Thread.__init__(self, name=servico.get_nome())
         self._servico = servico
         self._inicio = None
         self._final = None
         self._resultado = None
 
-        def run():
-            self._resultado = self._servico.executar()
-
-    def get_resultado(self):
-        '''
-        Retorna None se não houver resultado,
-        retorna um dict caso haja um resultado
-        '''
-        self._resultado
-
+    def run(self):
+        self._servico.executar()
 
     def get_nome(self):
         return self._servico.get_nome()
@@ -108,9 +101,13 @@ class Servico_diario:
     def __init__(self, backup):
         self._backup = backup
         self._config = config.Configuracao()
+        self._dict_resultado_executar = {}
 
     def get_nome(self):
         return self._backup.nome
+
+    def get_resultado(self):
+        return self._dict_resultado_executar
 
 
     def verifica_execucao(self):
@@ -142,54 +139,51 @@ class Servico_diario:
         '''
 
     def executar(self):
-        dict_resultado = {}
 
         resultado = self.executa_sc_pre()
-        dict_resultado['executa_sc_pre'] = resultado
+        self._dict_resultado_executar['executa_sc_pre'] = resultado
 
         if self._backup.backup_auto == 'Sim':
             resultado = self.executa_sc_backup()
-            dict_resultado['executa_backup_auto'] = resultado
+            self._dict_resultado_executar['executa_backup_auto'] = resultado
         else:
             resultado = self.executa_sc_nativo()
-            dict_resultado['executa_sc_nativo'] = resultado
+            self._dict_resultado_executar['executa_sc_nativo'] = resultado
 
         resultado = self.executa_sc_pos()
-        dict_resultado['executa_sc_pos'] = resultado
-
-        return dict_resultado
+        self._dict_resultado_executar['executa_sc_pos'] = resultado
 
 
     def executa_sc_pre(self):
-        execucao = 'OK'
+        execucao = 'sucesso'
         str_sc = self._backup.sc_pre_execucao
         if str_sc == '':
             process = subprocess.Popen(str_sc, shell=True, stdout=subprocess.PIPE)
             output, erro = process.communicate()
             if erro == None:
-                execucao = 'ERRO'
+                execucao = 'erro'
 
         return execucao
 
     def executa_sc_pos(self):
-        execucao = 'OK'
+        execucao = 'sucesso'
         str_sc = self._backup.sc_pos_execucao
         if str_sc == '':
             process = subprocess.Popen(str_sc, shell=True, stdout=subprocess.PIPE)
             output, erro = process.communicate()
             if erro == None:
-                execucao = 'ERRO'
+                execucao = 'erro'
 
         return execucao
 
     def executa_sc_backup(self):
-        execucao = 'OK'
+        execucao = 'sucesso'
         str_sc = self._backup.sc_backup
         if str_sc == '':
             processo = subprocess.Popen(str_sc, shell=True, stdout=subprocess.PIPE)
             output, erro = processo.communicate()
             if erro == None:
-                execucao = 'ERRO'
+                execucao = 'erro'
 
         return execucao
 
@@ -203,7 +197,9 @@ class Servico_diario:
         self.backup_zip = backup_zip.Backup_zip(self._backup.tipo, path_origem,
                                             self._get_path_abs_backup(), self._config.os_system())
 
-        self.backup_zip.zip_backup()
+        resultado = self.backup_zip.zip_backup()
+
+        return resultado
 
 
     def verifica_backup_existe(self):
@@ -217,10 +213,12 @@ class Servico_diario:
         arquivo_existe = os.path.isfile(arquivo)
         #foi criado na data de hoje?
         if arquivo_existe:
-            data_hoje = datetime.datetime.now().strftime('%d/%m%/%Y')
-            arquivo_backup = os.stat(self._get_path_abs_backup())
-            data_arquivo = time.strftime('%d/%m/%Y', time.localtime(arquivo_backup[stat.ST_CTIME]))
-            if data_arquivo == data_hoje:
+            data_hoje = datetime.datetime.now().strftime('%d/%m/%Y')
+            arquivo_stat = os.stat(self._get_path_abs_backup())
+            arquivo_data_criacao = datetime.datetime.fromtimestamp(arquivo_stat[stat.ST_CTIME])
+            arquivo_data_str = arquivo_data_criacao.strftime('%d/%m/%Y')
+
+            if arquivo_data_str == data_hoje:
                 backup_existe = True
 
         return backup_existe
@@ -229,21 +227,21 @@ class Servico_diario:
         '''
         Gerar a resposta com as definições do arquivo: md5, tamanho e data criação para resposta
         '''
-        arquivo = self._get_path_abs_backup()
+        arquivo_path = self._get_path_abs_backup()
 
         nome = self._get_format_nome()
         path = self._backup.path_destino
         #data de criação
-        arquivo_stat = os.stat(arquivo)
+        arquivo_stat = os.stat(arquivo_path)
         arquivo_size = arquivo_stat[stat.ST_SIZE]
-        date = arquivo_stat[stat.ST_CTIME]
-        f_data = time.strftime('%d/%m/%Y %H:%M:%S', date)
+        time_stamp = arquivo_stat[stat.ST_CTIME]
+        data_criacao = datetime.datetime.fromtimestamp(time_stamp)
         #hash verificação
-        md5 = util.Gerar_md5().get_md5(arquivo)
+        md5 = util.Gerar_md5().get_md5(arquivo_path)
 
-        arquivo = arquivo.Arquivo(nome, path, md5, f_data)
+        a = arquivo.Arquivo(nome, path, md5, data_criacao)
 
-        return arquivo
+        return a
 
 
 
