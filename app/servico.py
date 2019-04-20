@@ -106,6 +106,9 @@ class Servico_diario:
     def get_nome(self):
         return self._backup.nome
 
+    def get_backup(self):
+        return self._backup
+
     def get_resultado(self):
         return self._dict_resultado_executar
 

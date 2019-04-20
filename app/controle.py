@@ -6,6 +6,7 @@ import servico
 import util
 import threading
 import time
+import registro
 
 class Controle:
 
@@ -142,21 +143,24 @@ class Controle:
             time.sleep(60)
 
     def _registar_servicos_finalizados(self):
-        '''
-        while self._loop_controle:
-            print('registrar servicos finalizados')
-            print('thread finalizados: {}'.format(self._threads_finalizados))
-            time.sleep(60)
-        '''
-
         # Registar no banco de dados
         #testar ate aqui
         while self._loop_controle:
             lista_finalizados = list(self._threads_finalizados.keys())
-            print('lista_finalizados: {}'.format(lista_finalizados))
+            print('lista_finalizados size: {}'.format(lista_finalizados))
             for key in lista_finalizados:
                 thread = self._threads_finalizados[key]
+                t_execucao = (thread.get_final_thread() - thread.get_inicio_thread())
                 servico = thread.get_servico()
+                backup = servico.get_backup()
+                arq = None
+                if servico.verifica_backup_existe():
+                    arq = servico.get_info_arquivo_backup()
+
+                self._registro = registro.Registro(backup, servico.get_resultado(), tempo_execucao=t_execucao, arquivo=arq)
+                self._registro.registrar()
+
+                '''
                 print('Nome servico: {}'.format(thread.get_nome()))
                 print('Delta time: {}'.format(thread.get_final_thread() - thread.get_inicio_thread()))
                 print('Resultado execucao: {}'.format(servico.get_resultado()))
@@ -166,7 +170,7 @@ class Controle:
                 print('Arquivo path: {}'.format(arquivo.path))
                 print('Arquivo md5: {}'.format(arquivo.hash_verificacao))
                 print('Arquivo data_criacao: {}'.format(arquivo.data_criacao))
-
+                '''
                 del self._threads_finalizados[key]
 
             time.sleep(60)

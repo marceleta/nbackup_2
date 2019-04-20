@@ -3,13 +3,13 @@
         {
             "nome":"backup_1",
             "backup_auto":"Nao",
-            "path_origem":"/home/marcelo/fonte",
+            "path_origem":"/home/marcelo/ISO",
             "path_destino":"/home/marcelo/backup",
             "tipo":"arquivo",
-            "fonte": "Fedora-Server-29-1.2.aarch64.raw.xz",
+            "fonte": "hirens-bootcd-15-2-es-en-win.zip",
             "periodo":"diario",
             "dia_semana":"",
-            "hora_execucao":"16:42",
+            "hora_execucao":"12:52",
             "sc_backup":"/home/marcelo/python/nbackup_2/app/sc_backup.sh",
             "sc_pre_execucao":"/home/marcelo/python/nbackup_2/app/sc_pre.sh",
             "sc_pos_execucao":"/home/marcelo/python/nbackup_2/app/sc_pos.sh"
@@ -17,13 +17,13 @@
         {
             "nome":"backup_2",
             "backup_auto":"Nao",
-            "path_origem":"/home/marcelo/fonte",
+            "path_origem":"/home/marcelo/ISO",
             "path_destino":"/home/marcelo/backup",
             "tipo":"arquivo",
-            "fonte": "incubating-netbeans-10.0-source.zip",
+            "fonte": "CentOS.ova",
             "periodo":"diario",
             "dia_semana":"",
-            "hora_execucao":"16:42",
+            "hora_execucao":"12:53",
             "sc_backup":"/home/marcelo/python/nbackup_2/app/sc_backup.sh",
             "sc_pre_execucao":"/home/marcelo/python/nbackup_2/app/sc_pre.sh",
             "sc_pos_execucao":"/home/marcelo/python/nbackup_2/app/sc_pos.sh"

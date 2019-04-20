@@ -37,8 +37,8 @@ except zipfile.LargeZipFile:
 
 '''
 
-#db = peewee.SqliteDatabase('db/nbackup.db')
-#db.create_tables([modelos.Backup, modelos.Arquivo])
+db = peewee.SqliteDatabase('db/nbackup.db')
+db.create_tables([modelos.Backup, modelos.Arquivo])
 
 '''
 backup = modelos.Backup()
@@ -65,7 +65,7 @@ arquivo.data_criacao = datetime.datetime.now()
 arquivo.backup = backup
 arquivo.save()
 '''
-
+'''
 bks = modelos.Backup.select()
 for b in bks:
     print('nome: {}'.format(b.nome))
@@ -77,3 +77,4 @@ a1 = modelos.Arquivo().select()
 for arquivo in a1:
     print('nome backup: {}'.format(arquivo.backup.nome))
     print('path: {}'.format(arquivo.path))
+'''

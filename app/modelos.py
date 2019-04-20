@@ -3,6 +3,13 @@ import datetime
 
 db = SqliteDatabase('db/nbackup.db')
 
+
+
+
+
+
+
+
 class BaseModel(Model):
     class Meta:
         database = db
@@ -11,17 +18,18 @@ class Backup(BaseModel):
 
     nome = CharField()
     tipo = CharField()
-    fonte = CharField()
-    path_origem = CharField()
-    path_destino = CharField()
+    tempo_execucao = FloatField()
+    data_execucao = DateTimeField()
+    #fonte = CharField()
+    #path_origem = CharField()
+    #path_destino = CharField()
     periodo = CharField()
     dia_semana = CharField()
-    #hora_execucao = CharField()
     hora_execucao = DateTimeField()
     sc_pre_execucao = CharField()
     sc_pos_execucao = CharField()
     sc_backup = CharField()
-    backup_auto = CharField()
+    sc_backup_auto = CharField()
 
     def hora(self):
         h = datetime.datetime.strptime(hora_execucao,'%H:%M')
