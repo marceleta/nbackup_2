@@ -7,7 +7,7 @@ import util
 import threading
 import time
 import registro
-
+import modelos
 class Controle:
 
     def __init__(self):
@@ -115,11 +115,34 @@ class Controle:
             print('Lista nome servicos: {}'.format(lista_nome_servicos))
             for key in lista_nome_servicos:
                 servico = dict_servicos[key]
-                if servico.verifica_execucao():
+                if self._verifica_servico_executado(servico.get_backup()):
+                    del dict_servicos[key]
+                elif servico.verifica_execucao():
                     self._add_servico_thread(servico)
                     del dict_servicos[key]
 
+                #servico = dict_servicos[key]
+                #if servico.verifica_execucao():
+                #    self._add_servico_thread(servico)
+                #    del dict_servicos[key]
+
             time.sleep(60)
+
+    def _verifica_servico_executado(self, backup):
+        '''
+        Verrifica se o backup já foi executado no dia corrente
+        Caso o servidor seja reiniciado nao executar os servicos de backup novamente
+        '''
+        resultado = False
+        data = util.Conv_data.get_date_now()
+        hora = util.Conv_data.str_to_time(backup.hora_execucao)
+        bkp = modelos.Backup.is_backup_executado(backup.nome, data, hora)
+
+        if bkp != None:
+            resultado = True
+
+        return resultado
+
 
     def _add_servico_thread(self, serv):
         thread = servico.ServicoThread(serv)

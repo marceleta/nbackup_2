@@ -1,5 +1,6 @@
 import modelos
 import datetime
+import util
 
 class Registro:
     def __init__(self, backup, resultado_execucao, tempo_execucao=None, arquivo=None):
@@ -12,9 +13,9 @@ class Registro:
         mbackup = modelos.Backup()
         mbackup.nome = self._backup.nome
         mbackup.tipo = self._backup.tipo
-        mbackup.data_execucao = datetime.datetime.now()
+        mbackup.data_execucao = util.Conv_data.get_date_now()
         mbackup.periodo = self._backup.periodo
-        if tempo_execucao != None:
+        if self._tempo_execucao != None:
             mbackup.tempo_execucao = self._tempo_execucao
         mbackup.dia_semana = self._backup.dia_semana
         split_hora = self._backup.hora_execucao.split(':')
@@ -30,15 +31,13 @@ class Registro:
             mbackup.sc_backup = self._resultado_execucao['executa_sc_nativo']
 
         mbackup.save()
-        print('mbackup: {}'.format(mbackup))
 
         if self._arquivo != None:
             m_arquivo = modelos.Arquivo()
             m_arquivo.nome = self._arquivo.nome
             m_arquivo.path = self._arquivo.path
             m_arquivo.hash_verificacao = self._arquivo.hash_verificacao
-            m_arquivo.data_criacao = sel._arquivo.data_criacao
+            m_arquivo.data_criacao = self._arquivo.data_criacao
             m_arquivo.backup = mbackup
 
             m_arquivo.save()
-            print('m_arquivo: {}'.format(m_arquivo))

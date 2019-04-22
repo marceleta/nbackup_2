@@ -1,5 +1,6 @@
 import json
 import hashlib
+import datetime
 
 class Conversor:
 
@@ -14,6 +15,8 @@ class Conversor:
         return json.loads(value)
 
 
+
+
 class Gerar_md5:
 
     @staticmethod
@@ -24,3 +27,24 @@ class Gerar_md5:
                 md5.update(chuck)
 
         return md5.hexdigest()
+
+class Conv_data:
+
+    @staticmethod
+    def get_date_now():
+        date_now = datetime.datetime.now()
+        date = datetime.date(year=date_now.year, month=date_now.month, day=date_now.day)
+
+        return date
+
+    @staticmethod
+    def str_to_time(str_hora):
+        '''
+        Recebe uma str no formato HH:MM e converte em datetime.time
+        '''
+        split_hora = str_hora.split(':')
+        int_hora = int(split_hora[0])
+        int_minutos = int(split_hora[1])
+        hora = datetime.time(hour=int_hora, minute=int_minutos)
+
+        return hora
