@@ -69,7 +69,7 @@ class Backup_zip:
                     else:
                         arquivo = self._path_origem + '/' + file
 
-                    zip.white(arquivo)
+                    zip.write(arquivo)
 
                 zip.close()
                 resultado = 'sucesso'

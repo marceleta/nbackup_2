@@ -13,7 +13,8 @@ class Backup(BaseModel):
 
     nome = CharField()
     tipo = CharField()
-    tempo_execucao = FloatField()
+    backup_auto = CharField(null=True)
+    tempo_execucao = FloatField(null=True)
     data_execucao = DateTimeField()
     #fonte = CharField()
     #path_origem = CharField()
@@ -21,10 +22,9 @@ class Backup(BaseModel):
     periodo = CharField()
     dia_semana = CharField()
     hora_execucao = DateTimeField()
-    sc_pre_execucao = CharField()
-    sc_pos_execucao = CharField()
-    sc_backup = CharField()
-    sc_backup_auto = CharField()
+    sc_pre_execucao = CharField(null=True)
+    sc_pos_execucao = CharField(null=True)
+    sc_backup = CharField(null=True)
 
     @staticmethod
     def is_backup_executado(nome, data_execucao, hora_execucao):
@@ -60,4 +60,5 @@ class Arquivo(BaseModel):
     path = CharField()
     hash_verificacao = CharField()
     data_criacao = CharField()
+    tamanho = FloatField()
     backup = ForeignKeyField(Backup, backref='backup')

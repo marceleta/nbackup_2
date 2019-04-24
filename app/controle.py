@@ -67,6 +67,9 @@ class Controle:
         elif comando == self._desligar_servidor:
             self._resposta = self.get_shutdown()
             self._cmd_desligar = True
+        elif comando == 'reiniciar':
+            self._resposta = 'reiniciando servicos'
+            self._reinicia_threads_controle()
 
         else:
             self._resposta == "comando_nao_encontrado"
@@ -107,6 +110,12 @@ class Controle:
         self._thread_controle[self._reg_serv_finalizados] = thread_reg_finalizado
         thread_reg_finalizado.start()
 
+    def _reinicia_threads_controle(self):
+        self._loop_controle = False
+        time.sleep(65)
+        self._config = config.Configuracao()
+        self._iniciar_thread_controle()
+
     def _verifica_servicos(self):
         dict_servicos = self._criar_servicos_diario()
         print('dict_servicos: {}'.format(dict_servicos))
@@ -115,10 +124,13 @@ class Controle:
             print('Lista nome servicos: {}'.format(lista_nome_servicos))
             for key in lista_nome_servicos:
                 servico = dict_servicos[key]
-                if self._verifica_servico_executado(servico.get_backup()):
-                    del dict_servicos[key]
-                elif servico.verifica_execucao():
-                    self._add_servico_thread(servico)
+                if servico.verifica_integridade_config():
+                    if self._verifica_servico_executado(servico.get_backup()):
+                        del dict_servicos[key]
+                    elif servico.verifica_execucao():
+                        self._add_servico_thread(servico)
+                        del dict_servicos[key]
+                else:
                     del dict_servicos[key]
 
                 #servico = dict_servicos[key]
@@ -226,4 +238,4 @@ class Controle:
         return not self._cmd_desligar
 
     def enviar_resposta(self):
-        return self._resposta
+        return self._resposta.encode('utf-8')

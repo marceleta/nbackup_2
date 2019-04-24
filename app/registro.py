@@ -25,8 +25,9 @@ class Registro:
         mbackup.hora_execucao = _hora_execucao
         mbackup.sc_pre_execucao = self._resultado_execucao['executa_sc_pre']
         mbackup.sc_pos_execucao = self._resultado_execucao['executa_sc_pos']
+        mbackup.backup_auto = self._backup.backup_auto
         if self._backup.backup_auto == 'Sim':
-            mbackup.sc_backup_auto = self._resultado_execucao['executa_backup_auto']
+            mbackup.sc_backup = self._resultado_execucao['executa_backup_auto']
         else:
             mbackup.sc_backup = self._resultado_execucao['executa_sc_nativo']
 
@@ -38,6 +39,15 @@ class Registro:
             m_arquivo.path = self._arquivo.path
             m_arquivo.hash_verificacao = self._arquivo.hash_verificacao
             m_arquivo.data_criacao = self._arquivo.data_criacao
+            m_arquivo.tamanho = self._arquivo.tamanho
             m_arquivo.backup = mbackup
 
             m_arquivo.save()
+
+    @staticmethod
+    def criar_banco():
+        try:
+            arquivo = open('db/nbackup.db')
+        except FileNotFoundError:
+            modelos.Backup.create_table()
+            modelos.Arquivo.create_table()

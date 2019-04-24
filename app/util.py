@@ -1,6 +1,25 @@
 import json
 import hashlib
 import datetime
+import logging
+
+logging.basicConfig(level=logging.INFO, filename='nbackup.log', filemode='a',
+                    format='%(asctime)s - %(levelname)s - %(message)s')
+
+
+class Log:
+
+    @staticmethod
+    def log(nivel_mensavem, mensagem):
+
+        if logging.INFO:
+            logging.info(mensagem)
+        elif logging.WARNING:
+            logging.warning(mensagem)
+        elif logging.DEBUG:
+            logging.debug(mensagem)
+        elif logging.ERROR:
+            logging.error(mensagem)
 
 class Conversor:
 
@@ -42,9 +61,13 @@ class Conv_data:
         '''
         Recebe uma str no formato HH:MM e converte em datetime.time
         '''
-        split_hora = str_hora.split(':')
-        int_hora = int(split_hora[0])
-        int_minutos = int(split_hora[1])
-        hora = datetime.time(hour=int_hora, minute=int_minutos)
+        hora = None
+        try:
+            split_hora = str_hora.split(':')
+            int_hora = int(split_hora[0])
+            int_minutos = int(split_hora[1])
+            hora = datetime.time(hour=int_hora, minute=int_minutos)
+        except ValueError:
+            hora = None
 
         return hora

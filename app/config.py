@@ -42,8 +42,7 @@ class Configuracao:
             #                    i['hora_execucao'], i['sc_pre_execucao'], i['sc_pos_execucao'])
                 self._backup = backup.Backup(i)
                 self._backup_list.append(self._backup)
-
-
+                
     @staticmethod
     def os_system():
         return platform.system()

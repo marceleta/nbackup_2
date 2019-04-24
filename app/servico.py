@@ -10,6 +10,7 @@ import subprocess
 import os, stat, time
 import threading
 from threading import Thread
+import logging
 
 class Template_servico(object):
 
@@ -112,7 +113,6 @@ class Servico_diario:
     def get_resultado(self):
         return self._dict_resultado_executar
 
-
     def verifica_execucao(self):
         is_executar = False
         hora_executar = self._backup.hora_execucao
@@ -124,22 +124,6 @@ class Servico_diario:
             is_executar = True
 
         return is_executar
-
-
-        '''
-        is_executar = False
-        horario = self._backup.hora_execucao
-
-        for str_hora in lista_horario:
-            _hora = self._conv_hora(str_hora)
-            if self._is_hora_exec(_hora):
-                self._hora_execucao = str_hora
-                print('hora_execucao: {}'.format(self._hora_execucao))
-                is_executar = True
-
-
-        return is_executar
-        '''
 
     def executar(self):
 
@@ -171,6 +155,7 @@ class Servico_diario:
     def executa_sc_pos(self):
         execucao = 'sucesso'
         str_sc = self._backup.sc_pos_execucao
+        print('executa_sc_pos: {}'.format(str_sc))
         if str_sc == '':
             process = subprocess.Popen(str_sc, shell=True, stdout=subprocess.PIPE)
             output, erro = process.communicate()
@@ -230,23 +215,54 @@ class Servico_diario:
         '''
         Gerar a resposta com as definições do arquivo: md5, tamanho e data criação para resposta
         '''
+        resultado = None
         arquivo_path = self._get_path_abs_backup()
+        arquivo_existe = os.path.isfile(arquivo_path)
 
-        nome = self._get_format_nome()
-        path = self._backup.path_destino
-        #data de criação
-        arquivo_stat = os.stat(arquivo_path)
-        arquivo_size = arquivo_stat[stat.ST_SIZE]
-        time_stamp = arquivo_stat[stat.ST_CTIME]
-        data_criacao = datetime.datetime.fromtimestamp(time_stamp)
-        #hash verificação
-        md5 = util.Gerar_md5().get_md5(arquivo_path)
+        if arquivo_existe:
+            nome = self._get_format_nome()
+            path = self._backup.path_destino
+            #data de criação
+            arquivo_stat = os.stat(arquivo_path)
+            arquivo_size = arquivo_stat[stat.ST_SIZE]
+            time_stamp = arquivo_stat[stat.ST_CTIME]
+            data_criacao = datetime.datetime.fromtimestamp(time_stamp)
+            #hash verificação
+            md5 = util.Gerar_md5().get_md5(arquivo_path)
 
-        a = arquivo.Arquivo(nome, path, md5, data_criacao)
+            resultado = arquivo.Arquivo(nome, path, md5, data_criacao, arquivo_size)
 
-        return a
+        return resultado
 
+    def verifica_integridade_config(self):
+        '''
+        Teste valores do arquivo de configuracao backup_list.json
+        futuramento mudar isso para o arquivo config
+        '''
+        resultato = False
+        if self._backup.tipo == 'arquivo':
+            resultado = os.path.isfile(self._get_path_abs_origem())
+        elif self._backup.tipo == 'diretorio':
+            resultado = os.path.isdir(self._backup.path_origem)
 
+        resultado = os.path.isdir(self._backup.path_destino)
+        '''
+        #scripts nao estao funcionando
+        if self._backup.backup_auto == 'Sim' and self._backup.backup_auto != '':
+            resultado = os.path.isfile(self._backup.sc_backup)
+        if self._backup.sc_pre_execucao != '':
+            resultado = os.path.isfile(self._backup.sc_pre_execucao)
+        if self._backup.sc_pos_execucao != '':
+            resultado = os.path.isfile(self._backup.sc_pos_execucao)
+        '''
+        hora_execucao = util.Conv_data.str_to_time(self._backup.hora_execucao)
+        if hora_execucao == None:
+            resultado = False
+
+        if not resultado:
+            util.Log.log(logging.ERROR, 'Configuracao do {} esta incorreta'.format(self._backup.nome))
+
+        return resultado
 
     def _get_path_abs_backup(self):
 
