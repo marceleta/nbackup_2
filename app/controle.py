@@ -84,7 +84,8 @@ class Controle:
 
         backup_json = json.dumps(list_str)
 
-        return backup_json.encode('utf-8')
+        return backup_json
+
 
     def _add_backup(self, lista_para_add):
         pass
@@ -233,8 +234,6 @@ class Controle:
         return 'desligando'.encode('utf-8')
 
     def get_running(self):
-
-        print(not self._cmd_desligar)
         return not self._cmd_desligar
 
     def enviar_resposta(self):
