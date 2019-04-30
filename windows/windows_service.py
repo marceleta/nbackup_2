@@ -52,3 +52,6 @@ class WindowsService(win32serviceutil.ServiceFramework):
     def desligar(self):
         comando = ['python', 'c:/nbackup/app/desligar_app.py']
         subprocess.call(comando)
+
+if __name__ == '__main__':
+    win32serviceutil.HandleCommandLine(WindowsService)
