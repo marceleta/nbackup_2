@@ -1,19 +1,10 @@
-#!/usr/bin/env python3
+import platform
+import subprocess
 
-import socket
-import json
+if platform.system() == 'Windows':
+    comando = ['python','c:/nbackup/app/comando_desligar_app.py']
+else:
+    comando = ['python3','/home/marcelo/python/nbackup_2/app/comando_desligar_app.py']
 
-HOST = "127.0.0.1"  # The server's hostname or IP address
-PORT = 5000  # The port used by the server
-
-data = {
-    "comando":"desligar"
-}
-data_json = json.dumps(data)
-
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.connect((HOST, PORT))
-    s.sendall(data_json.encode('utf-8'))
-    data = s.recv(1024)
-
-print("Received", repr(data))
+processo = subprocess.call(comando)
+print('Status: {}'.format(processo))
