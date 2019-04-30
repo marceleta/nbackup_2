@@ -33,8 +33,8 @@ class WindowsService(win32serviceutil.ServiceFramework):
         win32event.setEvent(self.hWaitStop)
         self.ReportServiceStatus(win32service.SERVICE_STOPPED)
         logging.info('Parar serviço')
-
-        self.desligar()
+        self._loop = False
+        #self.desligar()
 
     def SvcDoRun(self):
         servicemanager.LogMsg(
@@ -43,11 +43,17 @@ class WindowsService(win32serviceutil.ServiceFramework):
             (self._svc_name_,'')
         )
         logging.info('Iniciando serviço')
+        self._loop = True
         self.iniciar()
 
     def iniciar(self):
-        comando = ['python','c:/nbackup/app/app.py']
-        subprocess.call(comando)
+        #comando = ['python','c:/nbackup/app/app.py']
+        #subprocess.call(comando)
+        while self._loop:
+            arquivo = open('c:/nbackup/app/app.py', 'a')
+            arquivo.write('loop!!')
+            time.sleep(15)
+
 
     def desligar(self):
         comando = ['python', 'c:/nbackup/app/desligar_app.py']

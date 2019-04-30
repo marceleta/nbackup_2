@@ -9,7 +9,7 @@
             "fonte": "hirens-bootcd-15-2-es-en-win.zip",
             "periodo":"diario",
             "dia_semana":"",
-            "hora_execucao":"15:46",
+            "hora_execucao":"17:55",
             "sc_backup":"/home/marcelo/python/nbackup_2/app/sc_backup.sh",
             "sc_pre_execucao":"/home/marcelo/python/nbackup_2/app/sc_pre.sh",
             "sc_pos_execucao":"/home/marcelo/python/nbackup_2/app/sc_pos.py"
@@ -23,7 +23,7 @@
             "fonte": "",
             "periodo":"diario",
             "dia_semana":"",
-            "hora_execucao":"15:46",
+            "hora_execucao":"17:55",
             "sc_backup":"/home/marcelo/python/nbackup_2/app/sc_backup.sh",
             "sc_pre_execucao":"/home/marcelo/python/nbackup_2/app/sc_pre.sh",
             "sc_pos_execucao":"/home/marcelo/python/nbackup_2/app/sc_pos.py"
