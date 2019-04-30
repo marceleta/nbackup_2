@@ -19,7 +19,7 @@ logging.basicConfig(
 )
 
 class WindowsService(win32serviceutil.ServiceFramework):
-    _svc_name = 'Serviço nBackup'
+    _svc_name_ = 'Serviço nBackup'
     _svc_display_name_ = 'Servidor nBackup'
 
     def __init__(self, *args):
