@@ -1,6 +1,7 @@
 import modelos
 import datetime
 import util
+import config
 
 class Registro:
     def __init__(self, backup, resultado_execucao, tempo_execucao=None, arquivo=None):
@@ -47,7 +48,12 @@ class Registro:
     @staticmethod
     def criar_banco():
         try:
-            arquivo = open('db/nbackup.db')
+            if config.Configuracao.os_system() == 'Windows':
+                path_db = 'c:/nbackup/app/db/nbackup.db'
+            else:
+                path_db = '/home/marcelo/python/nbackup_2/app/db/nbackup.db'
+
+            arquivo = open(path_db)
         except FileNotFoundError:
             modelos.Backup.create_table()
             modelos.Arquivo.create_table()

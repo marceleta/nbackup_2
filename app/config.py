@@ -8,14 +8,17 @@ import platform
 class Configuracao:
 
     def __init__(self):
+        self._config_path()
         self._set_usuario()
         self._set_server()
         self._set_backup()
 
+        print(self._path)
+
 
     def _set_usuario(self):
 
-        with open('login.json') as login_json:
+        with open(self._path + 'login.json') as login_json:
             self._usuarios = json.load(login_json)
             #self.list_usuarios = []
             #for p in data['login']:
@@ -24,7 +27,7 @@ class Configuracao:
 
     def _set_server(self):
 
-        with open('server.json') as server_json:
+        with open(self._path + 'server.json') as server_json:
             self._server = json.load(server_json)
             #p = data['server']
             #for i in p:
@@ -33,7 +36,7 @@ class Configuracao:
 
     def _set_backup(self):
 
-        with open('backup_list.json') as backup_json:
+        with open(self._path + 'backup_list.json') as backup_json:
             data = json.load(backup_json)
             b = data['backup']
             self._backup_list = []
@@ -42,10 +45,16 @@ class Configuracao:
             #                    i['hora_execucao'], i['sc_pre_execucao'], i['sc_pos_execucao'])
                 self._backup = backup.Backup(i)
                 self._backup_list.append(self._backup)
-                
+
     @staticmethod
     def os_system():
         return platform.system()
+
+    def _config_path(self):
+        if self.os_system() == 'Windows':
+            self._path = 'c:/nbackup/app/'
+        else:
+            self._path = '/home/marcelo/python/nbackup_2/app/'
 
     def get_usuarios(self):
         return self._usuarios

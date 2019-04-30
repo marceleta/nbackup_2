@@ -7,4 +7,3 @@ else:
     comando = ['python3','/home/marcelo/python/nbackup_2/app/comando_desligar_app.py']
 
 processo = subprocess.call(comando)
-print('Status: {}'.format(processo))
