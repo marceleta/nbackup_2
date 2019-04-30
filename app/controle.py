@@ -12,7 +12,6 @@ class Controle:
 
     def __init__(self):
         self._fim_conexao = 'fim'
-        self._desligar_servidor = 'desligar_servidor'
         self._cmd_desligar = False
         self._mensage = ''
         self._data = bytes()
@@ -64,9 +63,9 @@ class Controle:
         elif comando == 'iniciar_ftp':
             self._resposta = self._iniciar_ftp()
 
-        elif comando == self._desligar_servidor:
-            self._resposta = self.get_shutdown()
-            self._cmd_desligar = True
+        elif comando == 'desligar':
+            self._resposta = 'desligando'
+            self._desligar_servidor()
         elif comando == 'reiniciar':
             self._resposta = 'reiniciando servicos'
             self._reinicia_threads_controle()
@@ -116,6 +115,12 @@ class Controle:
         time.sleep(65)
         self._config = config.Configuracao()
         self._iniciar_thread_controle()
+
+    def _desligar_servidor(self):
+        self._loop_controle = False
+        time.sleep(65)
+        self._cmd_desligar = True
+
 
     def _verifica_servicos(self):
         dict_servicos = self._criar_servicos_diario()
@@ -234,7 +239,7 @@ class Controle:
         return 'desligando'.encode('utf-8')
 
     def get_running(self):
-        return not self._cmd_desligar
+        return self._cmd_desligar
 
     def enviar_resposta(self):
         return self._resposta.encode('utf-8')

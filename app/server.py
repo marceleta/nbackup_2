@@ -77,8 +77,8 @@ class SelectorServer:
                 self._controle.processar_mensagem()
                 #logging.info('recebi dados de: {}'.format(conn.getpeername()))
                 conn.send(self._controle.enviar_resposta())
-                if not self._controle.get_running():
-                    self._set_is_running(self._controle.get_running(), conn)
+                if self._controle.get_running():
+                    self._set_is_running(False)
             else:
                 self.close_connection(conn)
 
@@ -86,7 +86,7 @@ class SelectorServer:
             self.close_connection(conn)
 
 
-    def _set_is_running(self, is_running,conn):
+    def _set_is_running(self, is_running):
         self._server_on_running = is_running
         self.selector.close()
         sys.exit()
