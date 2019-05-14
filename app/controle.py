@@ -8,6 +8,8 @@ import threading
 import time
 import registro
 import modelos
+from servidor_ftp import Gestao_ftp
+
 class Controle:
 
     def __init__(self):
@@ -21,6 +23,7 @@ class Controle:
         self._thread_servico = {}
         self._thread_controle = {}
         self._threads_finalizados = {}
+        self._threads_ftps = {}
         self._lista_bkp_executando = []
         self._verifica_servico = 'Verifica servicos'
         self._threads_ativos = 'Threads ativos'
@@ -48,31 +51,46 @@ class Controle:
     def processar_mensagem(self):
         data_json = json.loads(self._data.decode('utf-8'))
         comando = data_json['comando']
+        del data_json['comando']
         print('Comando: {}'.format(comando))
 
         if comando == 'bkp_list':
             self._resposta = self._lista_backups()
 
-        elif comando == 'add_bkp':
-            bkp_para_add = data_json['bkp_list_add']
-            self._resposta = self._add_backup(bkp_para_add)
+        elif comando == 'update_lst_bkp':
+            self._resposta = self._atualizar_config_bkps(data_json)
 
-        elif comando == 'list_bkp_prontos':
+        elif comando == 'list_bkps_prontos':
             self._resposta = self._backups_prontos()
 
         elif comando == 'iniciar_ftp':
-            self._resposta = self._iniciar_ftp()
+            self._resposta = self._iniciar_ftp(data_json)
+
+        elif comando == 'desligar_ftp':
+            self._resposta = self._desligar_ftp(data_json)
 
         elif comando == 'desligar':
             self._resposta = 'desligando'
             self._desligar_servidor()
+
         elif comando == 'reiniciar':
             self._resposta = 'reiniciando servicos'
             self._reinicia_threads_controle()
 
-        else:
-            self._resposta == "comando_nao_encontrado"
+        elif comando == 'teste':
+            self._resposta = 'ok'
 
+        else:
+            self._resposta = "comando_nao_encontrado"
+
+
+    def _atualizar_config_bkps(self, comando):
+        self._config.salvar_config_bkps(comando)
+        resposta = {
+            'resposta':'salvar_bkps_ok'
+        }
+
+        return json.dumps(resposta)
 
     def _lista_backups(self):
         list_backup = self._config.get_backups()
@@ -90,10 +108,56 @@ class Controle:
         pass
 
     def _backups_prontos(self):
-        pass
+        arquivos = modelos.Arquivo.get_is_enviado()
+        lista_arquivos = []
+        for arquivo in arquivos:
+            d = {
+            'id':arquivo.id,
+            'nome':arquivo.nome,
+            'path':arquivo.path,
+            'hash_verificacao':arquivo.hash_verificacao,
+            'data_criacao':arquivo.data_criacao,
+            'tamanho':arquivo.tamanho,
+            'backup':arquivo.backup.nome,
+            'is_enviado':arquivo.is_enviado
+            }
+            lista_arquivos.append(d)
 
-    def _iniciar_ftp(self):
-        pass
+        resposta = {
+            'resposta':'lst_bkps_prontos',
+            'arquivos':lista_arquivos
+        }
+
+        return json.dumps(resposta)
+
+
+    def _iniciar_ftp(self, comando):
+        gestao_ftp = Gestao_ftp(comando['diretorio'], comando['nome_backup'])
+        self._threads_ftps[comando['nome_backup']] = gestao_ftp
+        gestao_ftp.iniciar()
+        resposta = {
+            'resposta':'ok'
+        }
+
+        return json.dumps(resposta)
+
+
+    def deligar_ftp(self, comando):
+        resposta = {
+            'resposta':'desligar_ftp_nao_encontrado'
+        }
+
+        ftps = self._threads_ftps.keys()
+        for key in keys:
+            gestor_ftp = self._threads_ftps[key]
+            if gestor_ftp.get_nome() == comando['nome_backup']:
+                gestor_ftp.desligar()
+                del self._threads_ftps[key]
+                resposta = {
+                    'resposta:':'desligar_ftp_ok'
+                }
+
+        return json.dumps(resposta)
 
     def _iniciar_thread_controle(self):
         self._loop_controle = True

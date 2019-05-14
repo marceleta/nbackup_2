@@ -1,80 +1,43 @@
-import time, datetime
-import modelos
-import peewee
+from config import Configuracao
+from servidor_ftp import Gestao_ftp
+from threading import Thread
+import time
 
 '''
-config = config.Configuracao()
+print('olamundo')
 
-lista_backups = config.get_backups()
-dict_servicos = {}
+authorizer = DummyAuthorizer()
+authorizer.add_user("user","12345","/home/marcelo/ftp",perm="elradfmw")
+#authorizer.add_anonymous("/home/marcelo/ftp", perm="elradfmw")
 
-for backup in lista_backups:
-    s = servico.Servico_diario(backup)
-    dict_servicos[backup.nome] = s
+handler = FTPHandler
+handler.authorizer = authorizer
 
-while True:
-
-    for key in dict_servicos.keys():
-        serv = dict_servicos[key]
-        if serv.verifica_execucao():
-            serv.executar()
-            sys.exit()
-
-
-    time.sleep(30)
-
-try:
-    zip = zipfile.ZipFile('teste.zip', mode='w')
-    zip.write('/home/marcelo/ISO/hirens-bootcd-15-2-es-en-win.zip')
-    zip.close()
-    print('final')
-except FileNotFoundError:
-    print('FileNotFoundError')
-except zipfile.BadZipfile:
-    print('except BadZipfile')
-except zipfile.LargeZipFile:
-    print('except LargeZipFile')
-
+server = FTPServer(("localhost", 5000), handler)
+print('pre server')
+server.serve_forever()
 '''
 
-db = peewee.SqliteDatabase('db/nbackup.db')
-db.create_tables([modelos.Backup, modelos.Arquivo])
-
 '''
-backup = modelos.Backup()
-backup.nome = 'backup_1'
-backup.tipo = 'arquivo'
-backup.fonte = 'sql.dump'
-backup.path_origem = '/home/marcelo/fonte'
-backup.path_destino = '/home/marcelo/backup'
-backup.periodo = 'diario'
-backup.dia_semana = ''
-hora = datetime.time(hour=15, minute=30)
-backup.hora_execucao = hora
-backup.sc_pre_execucao = '/home/marcelo/script/script.sh'
-backup.sc_pos_execucao = '/home/marcelo/script/script.sh'
-backup.sc_backup = '/home/marcelo/script/backup.sh'
-backup.backup_auto = 'Nao'
-backup.save()
-
-arquivo = modelos.Arquivo()
-arquivo.nome = 'backup_1.zip'
-arquivo.path = '/home/marcelo/backup'
-arquivo.hash_verificacao = '123456d8f5g6e9d3s2d4d5f'
-arquivo.data_criacao = datetime.datetime.now()
-arquivo.backup = backup
-arquivo.save()
+config = Configuracao()
+config_ftp = config.get_config_ftp()
+servidor_ftp = Servidor_ftp(config_ftp,'/home/marcelo/ftp')
+thread = Ftp_thread(servidor_ftp)
+thread.start()
 '''
-'''
-bks = modelos.Backup.select()
-for b in bks:
-    print('nome: {}'.format(b.nome))
-    print('hora_execucao: {}'.format(b.hora_execucao))
-    #print('type hora: {}'.format(type(b.hora())))
 
-a1 = modelos.Arquivo().select()
+ftp = Gestao_ftp('/home/marcelo/ftp', 'backup_1')
+ftp.iniciar()
+contador = 0
+while contador <= 20:
+    print('nome: {}'.format(ftp.get_nome()))
+    print('is_alive: {}'.format(ftp.is_ativo()))
+    time.sleep(3)
+    contador = contador + 1
+    if contador == 10:
+        print('desligando ftp')
+        ftp.desligar()
 
-for arquivo in a1:
-    print('nome backup: {}'.format(arquivo.backup.nome))
-    print('path: {}'.format(arquivo.path))
-'''
+
+print('is_alive: {}'.format(ftp.is_ativo()))
+print('fim')

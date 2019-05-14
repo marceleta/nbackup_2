@@ -61,4 +61,25 @@ class Arquivo(BaseModel):
     hash_verificacao = CharField()
     data_criacao = CharField()
     tamanho = FloatField()
+    is_enviado = BooleanField(default=False)
     backup = ForeignKeyField(Backup, backref='backup')
+
+    @staticmethod
+    def get_is_enviado():
+        arquivos = Arquivo.select().where(Arquivo.is_enviado==False)
+
+        return arquivos
+
+    def get_dict(self):
+        d = {
+            'id':id,
+            'nome':nome,
+            'path':path,
+            'hash_verificacao':hash_verificacao,
+            'data_criacao':data_criacao,
+            'tamanho':tamanho,
+            'is_enviado':is_enviado,
+            'backup_id':backup
+        }
+
+        return d
