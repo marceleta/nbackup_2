@@ -135,7 +135,7 @@ class Controle:
         gestao_ftp = Gestao_ftp(comando['path'], comando['nome'])
         self._threads_ftps[comando['backup']] = gestao_ftp
         gestao_ftp.iniciar()
-        
+
         resposta = {
             'resposta':'ftp_ok'
         }
@@ -151,7 +151,7 @@ class Controle:
         ftps = self._threads_ftps.keys()
         for key in keys:
             gestor_ftp = self._threads_ftps[key]
-            if gestor_ftp.get_nome() == comando['nome_backup']:
+            if gestor_ftp.get_nome() == comando['nome']:
                 gestor_ftp.desligar()
                 del self._threads_ftps[key]
                 resposta = {

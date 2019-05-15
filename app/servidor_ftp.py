@@ -25,6 +25,24 @@ class Gestao_ftp:
     def is_ativo(self):
         return self._thread_ftp.is_alive()
 
+class Gestao_ftp:
+
+    def __init__(self):
+        self._loop_gestao = True
+        self._thread_gestao = []
+        self._ftp_em_espera = []
+        self._ftp_em_andamento = []
+        self._ftp_finalizados = []
+
+
+    def adicionar(self, config_ftp, diretorio):
+        c_ftp = Servidor_ftp(config_ftp, diretorio)
+        thread = Ftp_thread(c_ftp, )
+
+
+
+
+
 
 class Ftp_thread(Thread):
 
@@ -67,38 +85,3 @@ class Servidor_ftp:
 
     def desligar_servidor(self):
         self._server.close_all()
-
-
-
-class Config_ftp:
-
-    def __init__(self, dict):
-        '''
-        Recebe um dicionario com as info de configuracao
-        '''
-        self._usuario = dict['usuario']
-        self._senha = dict['senha']
-        self._permissao = dict['permissao']
-        self._host = dict['host']
-        self._porta = int(dict['porta'])
-
-
-    @property
-    def usuario(self):
-        return self._usuario
-
-    @property
-    def senha(self):
-        return self._senha
-
-    @property
-    def permissao(self):
-        return self._permissao
-
-    @property
-    def host(self):
-        return self._host
-
-    @property
-    def porta(self):
-        return self._porta
