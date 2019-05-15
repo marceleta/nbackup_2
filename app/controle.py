@@ -132,11 +132,12 @@ class Controle:
 
 
     def _iniciar_ftp(self, comando):
-        gestao_ftp = Gestao_ftp(comando['diretorio'], comando['nome_backup'])
-        self._threads_ftps[comando['nome_backup']] = gestao_ftp
+        gestao_ftp = Gestao_ftp(comando['path'], comando['nome'])
+        self._threads_ftps[comando['backup']] = gestao_ftp
         gestao_ftp.iniciar()
+        
         resposta = {
-            'resposta':'ok'
+            'resposta':'ftp_ok'
         }
 
         return json.dumps(resposta)
