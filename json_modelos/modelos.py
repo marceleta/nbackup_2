@@ -20,7 +20,6 @@ class Config_server:
     def qtd_conecoes(self):
         return self._qtd_conecoes
 
-    @property
     def config_ftp(self):
         return self._ftp
 

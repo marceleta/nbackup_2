@@ -3,7 +3,7 @@ import threading
 import time
 from configuracao.config import Configuracao
 from json_modelos.modelos import Backup, Backup_dict
-from servico.servico import Servico_diario
+from servico.servico import Servico_diario, ServicoThread
 from util.util import Conv_data, Conversor, Gerar_md5
 from registro.registro import Registro
 from ftp.servidor_ftp import Gestao_ftp
@@ -18,6 +18,7 @@ class Controle:
         self._mensage = ''
         self._data = bytes()
         self._config = Configuracao()
+        self._gestao_ftp = Gestao_ftp()
         self._bkp_conversor = Backup_dict()
         self._loop_controle = True
         self._thread_servico = {}
@@ -66,8 +67,8 @@ class Controle:
         elif comando == 'iniciar_ftp':
             self._resposta = self._iniciar_ftp(data_json)
 
-        elif comando == 'desligar_ftp':
-            self._resposta = self._desligar_ftp(data_json)
+        elif comando == 'fechar_ftp':
+            self._resposta = self._fechar_ftp(data_json)
 
         elif comando == 'desligar':
             self._resposta = 'desligando'
@@ -132,15 +133,12 @@ class Controle:
 
 
     def _iniciar_ftp(self, comando):
-        gestao_ftp = Gestao_ftp(comando['path'], comando['nome'])
-        self._threads_ftps[comando['backup']] = gestao_ftp
-        gestao_ftp.iniciar()
-
-        resposta = {
-            'resposta':'ftp_ok'
-        }
+        resposta = self._gestao_ftp.adicionar(comando)
 
         return json.dumps(resposta)
+
+    def _fechar_ftp(self, comando):
+        self._gestao_ftp.desligar(comando)
 
 
     def deligar_ftp(self, comando):

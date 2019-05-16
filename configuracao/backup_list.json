@@ -1,1 +1,32 @@
-{"backups": [{"nome": "backup_5", "backup_auto": "Nao", "path_origem": "/home/marcelo/ISO", "path_destino": "/home/marcelo/backup", "tipo": "arquivo", "fonte": "hirens-bootcd-15-2-es-en-win.zip", "periodo": "diario", "dia_semana": "", "hora_execucao": "15:55", "sc_backup": "/home/marcelo/python/nbackup_2/app/sc_backup.sh", "sc_pre_execucao": "/home/marcelo/python/nbackup_2/app/sc_pre.sh", "sc_pos_execucao": "/home/marcelo/python/nbackup_2/app/sc_pos.py"}, {"nome": "backup_6", "backup_auto": "Nao", "path_origem": "/home/marcelo/ISO", "path_destino": "/home/marcelo/backup", "tipo": "arquivo", "fonte": "hirens-bootcd-15-2-es-en-win.zip", "periodo": "diario", "dia_semana": "", "hora_execucao": "15:55", "sc_backup": "/home/marcelo/python/nbackup_2/app/sc_backup.sh", "sc_pre_execucao": "/home/marcelo/python/nbackup_2/app/sc_pre.sh", "sc_pos_execucao": "/home/marcelo/python/nbackup_2/app/sc_pos.py"}]}
+{
+    "backups": [
+                {
+                    "nome": "backup_1",
+                    "backup_auto": "Nao",
+                    "path_origem": "/home/marcelo/fonte/backup1",
+                    "path_destino": "/home/marcelo/backup/backup1",
+                    "tipo": "arquivo",
+                    "fonte": "hirens-bootcd-15-2-es-en-win.zip",
+                    "periodo": "diario",
+                    "dia_semana": "",
+                    "hora_execucao": "14:15",
+                    "sc_backup": "/home/marcelo/python/nbackup/configuracao/sc_backup.sh",
+                    "sc_pre_execucao": "/home/marcelo/python/nbackup/configuracao/sc_pre.sh",
+                    "sc_pos_execucao": "/home/marcelo/python/nbackup/configuracao/sc_pos.py"
+                },
+                {
+                    "nome": "backup_2",
+                    "backup_auto": "Nao",
+                    "path_origem": "/home/marcelo/fonte/backup2",
+                    "path_destino": "/home/marcelo/backup/backup2",
+                    "tipo": "arquivo",
+                    "fonte": "CentOS.ova",
+                    "periodo": "diario",
+                    "dia_semana": "",
+                    "hora_execucao": "14:15",
+                    "sc_backup": "/home/marcelo/python/nbackup_2/app/sc_backup.sh",
+                    "sc_pre_execucao": "/home/marcelo/python/nbackup_2/app/sc_pre.sh",
+                    "sc_pos_execucao": "/home/marcelo/python/nbackup_2/app/sc_pos.py"
+                }
+                ]
+}

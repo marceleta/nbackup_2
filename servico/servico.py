@@ -183,7 +183,7 @@ class Servico_diario:
         else:
             path_origem = self._backup.path_origem
 
-        self.backup_zip = backup_zip.Backup_zip(self._backup.tipo, path_origem,
+        self.backup_zip = Backup_zip(self._backup.tipo, path_origem,
                                             self._get_path_abs_backup(), self._config.os_system())
 
         resultado = self.backup_zip.zip_backup()
@@ -229,7 +229,7 @@ class Servico_diario:
             time_stamp = arquivo_stat[stat.ST_CTIME]
             data_criacao = datetime.datetime.fromtimestamp(time_stamp)
             #hash verificação
-            md5 = util.Gerar_md5().get_md5(arquivo_path)
+            md5 = Gerar_md5().get_md5(arquivo_path)
 
             resultado = Arquivo(nome, path, md5, data_criacao, arquivo_size)
 
@@ -285,7 +285,7 @@ class Servico_diario:
 
     def _get_format_nome(self):
         nome_arquivo = self._backup.nome
-        posfixo = backup.Backup.dict_dia_semana[datetime.datetime.today().weekday()] + '_' + self._backup.hora_execucao.replace(':','')
+        posfixo = Backup.dict_dia_semana[datetime.datetime.today().weekday()] + '_' + self._backup.hora_execucao.replace(':','')
         nome_completo = nome_arquivo + '_' + posfixo + '.zip'
 
         return nome_completo

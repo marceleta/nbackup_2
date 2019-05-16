@@ -56,5 +56,5 @@ class Registro:
 
             arquivo = open(path_db)
         except FileNotFoundError:
-            modelos.Backup.create_table()
-            modelos.Arquivo.create_table()
+            Backup.create_table()
+            Arquivo.create_table()

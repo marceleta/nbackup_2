@@ -6,47 +6,50 @@ from configuracao.config import Configuracao
 
 class Gestao_ftp:
 
-    def __init__(self, diretorio, nome):
-        self._dir = diretorio
-        self._config = Configuracao()
-        self._ftp_serv = Servidor_ftp(self._config.get_config_ftp(), self._dir)
-        self._thread_ftp = Ftp_thread(self._ftp_serv, nome)
+        def __init__(self):
+            self._config = Configuracao()
+            self._ftp = self._config.get_server_config().config_ftp()
+            self._ftp_andamento = {}
+            self._ftp_finalizado = []
+            self._erros = {}
 
 
-    def iniciar(self):
-        self._thread_ftp.start()
+        def adicionar(self, info_ftp):
+            self._info_ftp = info_ftp
+            thread = Ftp_thread(self._ftp, self._info_ftp['path'], self._info_ftp['nome'])
+            self._ftp_andamento[backup.nome] = thread
+            thread.start()
 
-    def desligar(self):
-        self._thread_ftp.desligar_servidor()
+            resposta = {
+                'resposta':'ftp_pronto_download',
+                'nome_ftp':self._info_ftp['nome']
+            }
 
-    def get_nome(self):
-        return self._thread_ftp.name
-
-    def is_ativo(self):
-        return self._thread_ftp.is_alive()
-
-class Gestao_ftp:
-
-    def __init__(self):
-        self._loop_gestao = True
-        self._thread_gestao = []
-        self._ftp_em_espera = []
-        self._ftp_em_andamento = []
-        self._ftp_finalizados = []
+            return resposta
 
 
-    def adicionar(self, config_ftp, diretorio):
-        c_ftp = Servidor_ftp(config_ftp, diretorio)
-        thread = Ftp_thread(c_ftp, )
+        def desligar(self, info_ftp):
+            try:
+                thread = self._ftp_andamento[info_ftp['nome']]
+                thread.desligar_servidor()
+                del self._ftp_andamento[info_ftp['nome']]
+                self._ftp_finalizado.append(thread)
+            except KeyError:
+                self._erros['KeyError'] = 'ftp {} nao encontrado'.format(info_ftp['nome'])
 
+        def is_erros(self):
+            return (len(self._erros) > 0)
 
+        def get_erros(self):
+            return self._erros
 
-
+        def get_ftp_finalizados(self):
+            return self._ftp_andamento
 
 
 class Ftp_thread(Thread):
 
-    def __init__(self, servidor_ftp, nome):
+    def __init__(self, servidor_ftp, diretorio, nome):
         Thread.__init__(self, name=nome)
         self._servidor = servidor_ftp
 
