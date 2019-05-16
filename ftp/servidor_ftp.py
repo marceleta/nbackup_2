@@ -2,13 +2,13 @@ from pyftpdlib.authorizers import DummyAuthorizer
 from pyftpdlib.handlers import FTPHandler
 from pyftpdlib.servers import MultiprocessFTPServer
 from threading import Thread
-import config
+from configuracao.config import Configuracao
 
 class Gestao_ftp:
 
     def __init__(self, diretorio, nome):
         self._dir = diretorio
-        self._config = config.Configuracao()
+        self._config = Configuracao()
         self._ftp_serv = Servidor_ftp(self._config.get_config_ftp(), self._dir)
         self._thread_ftp = Ftp_thread(self._ftp_serv, nome)
 

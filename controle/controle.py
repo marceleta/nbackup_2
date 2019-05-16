@@ -1,14 +1,14 @@
-
-import config
 import json
-import backup
-import servico
-import util
 import threading
 import time
-import registro
-import modelos
-from servidor_ftp import Gestao_ftp
+from configuracao.config import Configuracao
+from json_modelos.modelos import Backup, Backup_dict
+from servico.servico import Servico_diario
+from util.util import Conv_data, Conversor, Gerar_md5
+from registro.registro import Registro
+from ftp.servidor_ftp import Gestao_ftp
+from db.modelos import Backup as Backup_db
+
 
 class Controle:
 
@@ -17,8 +17,8 @@ class Controle:
         self._cmd_desligar = False
         self._mensage = ''
         self._data = bytes()
-        self._config = config.Configuracao()
-        self._bkp_conversor = backup.Backup_dict()
+        self._config = Configuracao()
+        self._bkp_conversor = Backup_dict()
         self._loop_controle = True
         self._thread_servico = {}
         self._thread_controle = {}
@@ -108,7 +108,7 @@ class Controle:
         pass
 
     def _backups_prontos(self):
-        arquivos = modelos.Arquivo.get_is_enviado()
+        arquivos = Arquivo.get_is_enviado()
         lista_arquivos = []
         for arquivo in arquivos:
             d = {
@@ -178,7 +178,7 @@ class Controle:
     def _reinicia_threads_controle(self):
         self._loop_controle = False
         time.sleep(65)
-        self._config = config.Configuracao()
+        self._config = Configuracao()
         self._iniciar_thread_controle()
 
     def _desligar_servidor(self):
@@ -217,9 +217,9 @@ class Controle:
         Caso o servidor seja reiniciado nao executar os servicos de backup novamente
         '''
         resultado = False
-        data = util.Conv_data.get_date_now()
-        hora = util.Conv_data.str_to_time(backup.hora_execucao)
-        bkp = modelos.Backup.is_backup_executado(backup.nome, data, hora)
+        data = Conv_data.get_date_now()
+        hora = Conv_data.str_to_time(backup.hora_execucao)
+        bkp = Backup_db.is_backup_executado(backup.nome, data, hora)
 
         if bkp != None:
             resultado = True
@@ -228,7 +228,7 @@ class Controle:
 
 
     def _add_servico_thread(self, serv):
-        thread = servico.ServicoThread(serv)
+        thread = ServicoThread(serv)
         self._thread_servico[serv.get_nome()] = thread
         thread.set_inicio_thread(time.time())
         thread.start()
@@ -263,7 +263,7 @@ class Controle:
                 if servico.verifica_backup_existe():
                     arq = servico.get_info_arquivo_backup()
 
-                self._registro = registro.Registro(backup, servico.get_resultado(), tempo_execucao=t_execucao, arquivo=arq)
+                self._registro = Registro(backup, servico.get_resultado(), tempo_execucao=t_execucao, arquivo=arq)
                 self._registro.registrar()
 
                 '''
@@ -294,7 +294,7 @@ class Controle:
         self._dict_servicos = {}
         for backup in lista_backup:
             if backup.periodo == 'diario':
-                servico_diario = servico.Servico_diario(backup)
+                servico_diario = Servico_diario(backup)
                 self._dict_servicos[backup.nome] = servico_diario
 
         return self._dict_servicos

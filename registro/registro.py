@@ -1,7 +1,8 @@
-import modelos
 import datetime
-import util
-import config
+
+from db.modelos import Backup, Arquivo
+from util.util import Conv_data
+from configuracao.config import Configuracao
 
 class Registro:
     def __init__(self, backup, resultado_execucao, tempo_execucao=None, arquivo=None):
@@ -11,10 +12,10 @@ class Registro:
         self._tempo_execucao = tempo_execucao
 
     def registrar(self):
-        mbackup = modelos.Backup()
+        mbackup = Backup()
         mbackup.nome = self._backup.nome
         mbackup.tipo = self._backup.tipo
-        mbackup.data_execucao = util.Conv_data.get_date_now()
+        mbackup.data_execucao = Conv_data.get_date_now()
         mbackup.periodo = self._backup.periodo
         if self._tempo_execucao != None:
             mbackup.tempo_execucao = self._tempo_execucao
@@ -35,7 +36,7 @@ class Registro:
         mbackup.save()
 
         if self._arquivo != None:
-            m_arquivo = modelos.Arquivo()
+            m_arquivo = Arquivo()
             m_arquivo.nome = self._arquivo.nome
             m_arquivo.path = self._arquivo.path
             m_arquivo.hash_verificacao = self._arquivo.hash_verificacao
@@ -48,10 +49,10 @@ class Registro:
     @staticmethod
     def criar_banco():
         try:
-            if config.Configuracao.os_system() == 'Windows':
-                path_db = 'c:/nbackup/app/db/nbackup.db'
+            if Configuracao.os_system() == 'Windows':
+                path_db = 'c:/nbackup/db/nbackup.db'
             else:
-                path_db = '/home/marcelo/python/nbackup_2/app/db/nbackup.db'
+                path_db = '/home/marcelo/python/nbackup/db/nbackup.db'
 
             arquivo = open(path_db)
         except FileNotFoundError:

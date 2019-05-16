@@ -1,16 +1,17 @@
 import datetime
-import backup
-import backup_zip
-import arquivo
-import util
 import sys
-import config
 from abc import ABC, abstractmethod
 import subprocess
 import os, stat, time
 import threading
 from threading import Thread
 import logging
+
+from json_modelos.modelos import Backup
+from backup.backup_zip import Backup_zip
+from arquivo.arquivo import Arquivo
+from util.util import Conv_data, Gerar_md5, Log
+from configuracao.config import Configuracao
 
 class Template_servico(object):
 
@@ -101,7 +102,7 @@ class Servico_diario:
 
     def __init__(self, backup):
         self._backup = backup
-        self._config = config.Configuracao()
+        self._config = Configuracao()
         self._dict_resultado_executar = {}
 
     def get_nome(self):
@@ -230,7 +231,7 @@ class Servico_diario:
             #hash verificação
             md5 = util.Gerar_md5().get_md5(arquivo_path)
 
-            resultado = arquivo.Arquivo(nome, path, md5, data_criacao, arquivo_size)
+            resultado = Arquivo(nome, path, md5, data_criacao, arquivo_size)
 
         return resultado
 
@@ -255,12 +256,12 @@ class Servico_diario:
         if self._backup.sc_pos_execucao != '':
             resultado = os.path.isfile(self._backup.sc_pos_execucao)
         '''
-        hora_execucao = util.Conv_data.str_to_time(self._backup.hora_execucao)
+        hora_execucao = Conv_data.str_to_time(self._backup.hora_execucao)
         if hora_execucao == None:
             resultado = False
 
         if not resultado:
-            util.Log.log(logging.ERROR, 'Configuracao do {} esta incorreta'.format(self._backup.nome))
+            Log.log(logging.ERROR, 'Configuracao do {} esta incorreta'.format(self._backup.nome))
 
         return resultado
 
