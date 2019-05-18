@@ -7,7 +7,7 @@ from servico.servico import Servico_diario, ServicoThread
 from util.util import Conv_data, Conversor, Gerar_md5
 from registro.registro import Registro
 from ftp.servidor_ftp import Gestao_ftp
-from db.modelos import Backup as Backup_db
+from db.modelos import Backup as Backup_db, Arquivo
 
 
 class Controle:
@@ -50,7 +50,9 @@ class Controle:
 
 
     def processar_mensagem(self):
-        data_json = json.loads(self._data.decode('utf-8'))
+        data_json = json.loads(self._data)
+        print('data_json: {}'.format(data_json))
+        print('data_json type: {}'.format(type(data_json)))
         comando = data_json['comando']
         del data_json['comando']
         print('Comando: {}'.format(comando))
@@ -84,6 +86,7 @@ class Controle:
         else:
             self._resposta = "comando_nao_encontrado"
 
+        self._data = None
 
     def _atualizar_config_bkps(self, comando):
         self._config.salvar_config_bkps(comando)
@@ -114,7 +117,7 @@ class Controle:
         for arquivo in arquivos:
             d = {
             'id':arquivo.id,
-            'nome':arquivo.nome,
+            'arquivo':arquivo.nome,
             'path':arquivo.path,
             'hash_verificacao':arquivo.hash_verificacao,
             'data_criacao':arquivo.data_criacao,
@@ -126,7 +129,7 @@ class Controle:
 
         resposta = {
             'resposta':'lst_bkps_prontos',
-            'arquivos':lista_arquivos
+            'conteudo':lista_arquivos
         }
 
         return json.dumps(resposta)
@@ -134,7 +137,6 @@ class Controle:
 
     def _iniciar_ftp(self, comando):
         resposta = self._gestao_ftp.adicionar(comando)
-
         return json.dumps(resposta)
 
     def _fechar_ftp(self, comando):

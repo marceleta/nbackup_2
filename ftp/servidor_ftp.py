@@ -9,15 +9,16 @@ class Gestao_ftp:
         def __init__(self):
             self._config = Configuracao()
             self._ftp = self._config.get_server_config().config_ftp()
+            print('ftp: {}'.format(self._ftp.host))
             self._ftp_andamento = {}
             self._ftp_finalizado = []
             self._erros = {}
 
 
         def adicionar(self, info_ftp):
-            self._info_ftp = info_ftp
+            self._info_ftp = info_ftp['backup']
             thread = Ftp_thread(self._ftp, self._info_ftp['path'], self._info_ftp['nome'])
-            self._ftp_andamento[backup.nome] = thread
+            self._ftp_andamento[self._info_ftp['nome']] = thread
             thread.start()
 
             resposta = {
@@ -49,18 +50,19 @@ class Gestao_ftp:
 
 class Ftp_thread(Thread):
 
-    def __init__(self, servidor_ftp, diretorio, nome):
+    def __init__(self, config_ftp, diretorio, nome):
         Thread.__init__(self, name=nome)
-        self._servidor = servidor_ftp
+        self._servidor_ftp = Servidor_ftp(config_ftp, diretorio)
+
 
     def run(self):
-        self._servidor.iniciar_servidor()
+        self._servidor_ftp.iniciar_servidor()
 
     def get_servidor_ftp(self):
-        return self._servidor
+        return self._servidor_ftp
 
     def desligar_servidor(self):
-        self._servidor.desligar_servidor()
+        self._servidor_ftp.desligar_servidor()
 
 
 class Servidor_ftp:

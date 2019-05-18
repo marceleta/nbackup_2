@@ -5,7 +5,7 @@ class Config_server:
     def __init__(self, dict):
         self._host = dict['host']
         self._porta = dict['porta']
-        self._qtd_conecoes = dict['qtd_conecoes']
+        self._qtd_conecoes = dict['qtd_conexoes']
         self._ftp = Config_ftp(dict['ftp'])
 
     @property

@@ -1,9 +1,9 @@
 {
     "server":
         {
-            "host":"127.0.0.1",
+            "host":"localhost",
             "porta":"5000",
-            "qtd_conecoes":"5",
+            "qtd_conexoes":"5",
             "ftp":{
                     "usuario":"marcelo",
                     "senha":"12345",
