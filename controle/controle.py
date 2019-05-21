@@ -51,11 +51,10 @@ class Controle:
 
     def processar_mensagem(self):
         data_json = json.loads(self._data)
-        print('data_json: {}'.format(data_json))
-        print('data_json type: {}'.format(type(data_json)))
         comando = data_json['comando']
         del data_json['comando']
         print('Comando: {}'.format(comando))
+        print('data_json: {}'.format(data_json))
 
         if comando == 'bkp_list':
             self._resposta = self._lista_backups()
@@ -112,7 +111,7 @@ class Controle:
         pass
 
     def _backups_prontos(self):
-        arquivos = Arquivo.get_is_enviado()
+        arquivos = Arquivo.get_nao_enviados()
         lista_arquivos = []
         for arquivo in arquivos:
             d = {
@@ -137,10 +136,20 @@ class Controle:
 
     def _iniciar_ftp(self, comando):
         resposta = self._gestao_ftp.adicionar(comando)
+        print(resposta)
         return json.dumps(resposta)
 
     def _fechar_ftp(self, comando):
         self._gestao_ftp.desligar(comando)
+        str_id = comando['id_arquivo']
+        id = int(str_id)
+        Arquivo.set_enviado(id)
+
+        resposta = {'resposta':'ok',
+                    'conteudo':'download arquivo executado com sucesso'
+                    }
+
+        return json.dumps(resposta)
 
 
     def deligar_ftp(self, comando):

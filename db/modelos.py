@@ -1,7 +1,7 @@
 from peewee import *
 import datetime
 
-db = SqliteDatabase('db/nbackup.db')
+db = SqliteDatabase('/home/marcelo/python/nbackup/db/nbackup.db')
 
 
 
@@ -42,8 +42,6 @@ class Backup(BaseModel):
 
         return bkp
 
-
-
     def hora(self):
         h = datetime.datetime.strptime(hora_execucao,'%H:%M')
         return h
@@ -62,13 +60,23 @@ class Arquivo(BaseModel):
     data_criacao = CharField()
     tamanho = FloatField()
     is_enviado = BooleanField(default=False)
+    data_envio = DateTimeField(null=True)
     backup = ForeignKeyField(Backup, backref='backup')
 
     @staticmethod
-    def get_is_enviado():
+    def get_nao_enviados():
         arquivos = Arquivo.select().where(Arquivo.is_enviado==False)
 
         return arquivos
+
+    @staticmethod
+    def set_enviado(id):
+        lista = Arquivo.select().where(Arquivo.id==id)
+        arquivo = lista[0]
+        arquivo.is_enviado = True
+        arquivo.data_envio = datetime.datetime.now()
+        arquivo.save()
+
 
     def get_dict(self):
         d = {
