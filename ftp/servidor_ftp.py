@@ -16,9 +16,9 @@ class Gestao_ftp:
 
 
         def adicionar(self, info_ftp):
-            self._info_ftp = info_ftp['backup']
-            thread = Ftp_thread(self._ftp, self._info_ftp['path'], self._info_ftp['nome'])
-            self._ftp_andamento[self._info_ftp['nome']] = thread
+            self._info_ftp = info_ftp
+            thread = Ftp_thread(self._ftp, info_ftp['path'], info_ftp['nome'])
+            self._ftp_andamento[info_ftp['nome']] = thread
             thread.start()
 
             resposta = {
@@ -29,17 +29,31 @@ class Gestao_ftp:
             return resposta
 
 
-        def desligar(self, info_ftp):
+        def desligar(self, nome_backup):
             is_desligado = False
             try:
-                thread = self._ftp_andamento[info_ftp['nome']]
-                is_desligado = thread.desligar_servidor()
+                thread = self._ftp_andamento[nome_backup]
+                thread.desligar_servidor()
                 self._ftp_finalizado.append(thread)
-                del self._ftp_andamento[info_ftp['nome']]
+                del self._ftp_andamento[nome_backup]
+                is_desligado = thread.is_desligado()
             except KeyError:
-                self._erros['KeyError'] = 'ftp {} nao encontrado'.format(info_ftp['nome'])
+                self._erros['KeyError'] = 'ftp {} nao encontrado'.format(nome_backup)
 
             return is_desligado
+
+        def get_em_andamento(self):
+            return self._ftp_andamento
+
+        def is_rodando_ftp(self):
+            is_rodando = False
+            keys = self._ftp_andamento.keys()
+            print('is_rodando:keys {}'.format(keys))
+            for key in keys:
+                thread = self._ftp_andamento[key]
+                is_rodando = thread.is_desligado()
+
+            return is_rodando
 
         def is_erros(self):
             return (len(self._erros) > 0)
@@ -70,8 +84,9 @@ class Ftp_thread(Thread):
         self._servidor_ftp.desligar_servidor()
         self._is_desligado = True
 
+
     def is_desligado(self):
-        return self.is_desligado
+        return self._is_desligado
 
 
 class Servidor_ftp:

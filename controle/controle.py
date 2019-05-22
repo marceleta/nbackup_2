@@ -126,21 +126,33 @@ class Controle:
             }
             lista_arquivos.append(d)
 
+
         resposta = {
             'resposta':'lst_bkps_prontos',
             'conteudo':lista_arquivos
         }
 
+        print('_backup_prontos:resposta {}'.format(resposta))
+
         return json.dumps(resposta)
 
 
     def _iniciar_ftp(self, comando):
-        resposta = self._gestao_ftp.adicionar(comando)
+        if not self._gestao_ftp.is_rodando_ftp():
+            resposta = self._gestao_ftp.adicionar(comando['backup'])
+        else:
+            resposta = {
+                'resposta':'ftp_rodando',
+                'conteudo':'ftp_ocupado'
+            }
+
         print(resposta)
+
         return json.dumps(resposta)
 
     def _fechar_ftp(self, comando):
-        self._gestao_ftp.desligar(comando)
+        is_desligado = self._gestao_ftp.desligar(comando['nome'])
+        print('_fechar_ftp:is_desligado: {}'.format(is_desligado))
         str_id = comando['id_arquivo']
         id = int(str_id)
         Arquivo.set_enviado(id)
@@ -151,23 +163,6 @@ class Controle:
 
         return json.dumps(resposta)
 
-
-    def deligar_ftp(self, comando):
-        resposta = {
-            'resposta':'desligar_ftp_nao_encontrado'
-        }
-
-        ftps = self._threads_ftps.keys()
-        for key in keys:
-            gestor_ftp = self._threads_ftps[key]
-            if gestor_ftp.get_nome() == comando['nome']:
-                gestor_ftp.desligar()
-                del self._threads_ftps[key]
-                resposta = {
-                    'resposta:':'desligar_ftp_ok'
-                }
-
-        return json.dumps(resposta)
 
     def _iniciar_thread_controle(self):
         self._loop_controle = True

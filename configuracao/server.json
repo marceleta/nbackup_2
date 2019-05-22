@@ -7,7 +7,7 @@
             "ftp":{
                     "usuario":"marcelo",
                     "senha":"12345",
-                    "permissao":"elradfmw",
+                    "permissao":"lr",
                     "host":"localhost",
                     "porta":"5002"
                 }
