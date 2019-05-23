@@ -153,6 +153,7 @@ class Controle:
     def _fechar_ftp(self, comando):
         is_desligado = self._gestao_ftp.desligar(comando['nome'])
         print('_fechar_ftp:is_desligado: {}'.format(is_desligado))
+        print('_fechar_ftp:comando: {}'.format(comando))
         str_id = comando['id_arquivo']
         id = int(str_id)
         Arquivo.set_enviado(id)

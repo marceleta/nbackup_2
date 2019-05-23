@@ -188,7 +188,7 @@ class Servico_diario:
 
         resultado = self.backup_zip.zip_backup()
 
-        return resultado
+        return resultado   
 
 
     def verifica_backup_existe(self):

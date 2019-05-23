@@ -72,10 +72,10 @@ class Arquivo(BaseModel):
     @staticmethod
     def set_enviado(id):
         lista = Arquivo.select().where(Arquivo.id==id)
-        arquivo = lista[0]
-        arquivo.is_enviado = True
-        arquivo.data_envio = datetime.datetime.now()
-        arquivo.save()
+        for arquivo in lista:
+            arquivo.is_enviado = True
+            arquivo.data_envio = datetime.datetime.now()
+            arquivo.save()
 
 
     def get_dict(self):

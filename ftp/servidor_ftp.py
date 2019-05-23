@@ -25,7 +25,7 @@ class Gestao_ftp:
                 'resposta':'ftp_pronto_download',
                 'conteudo':self._info_ftp['nome']
             }
-
+            print('servidor_ftp:adicionar {}'.format(resposta))
             return resposta
 
 
