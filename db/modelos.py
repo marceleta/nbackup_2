@@ -1,9 +1,10 @@
 from peewee import *
 import datetime
+from configuracao.config import Configuracao
 
-db = SqliteDatabase('/home/marcelo/python/nbackup/db/nbackup.db')
-
-
+config = Configuracao()
+path_db = config.get_path() + 'db/nbackup.db'
+db = SqliteDatabase(path_db)
 
 class BaseModel(Model):
     class Meta:

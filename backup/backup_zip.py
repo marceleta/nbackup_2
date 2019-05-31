@@ -3,6 +3,7 @@ import zipfile
 import datetime
 import os
 import stat
+from util.util import Log
 
 class Backup_zip:
 
@@ -36,24 +37,21 @@ class Backup_zip:
         try:
             zip = zipfile.ZipFile(self._path_destino, mode='w', allowZip64=True)
             zip.write(self._path_origem)
+            Log.info('zipando arquivo: {}'.format(self._path_destino))
             zip.close()
             resultado = 'sucesso'
         except FileNotFoundError:
+            Log.error('erro zip arquivo:{} erro: {}'.format(self._path_destino, 'FileNotFoundError'))
             resultado = resultado + 'FileNotFoundError'
         except zipfile.BadZipfile:
             resultado = resultado + 'BadZipfile'
+            Log.error('erro zip arquivo:{} erro: {}'.format(self._path_destino, 'BadZipfile'))
         except zipfile.LargeZipFile:
             resultado = resultado + 'LargeZipFile'
+            Log.error('erro zip arquivo:{} erro: {}'.format(self._path_destino, 'LargeZipFile'))
 
         return resultado
-
-
-        '''
-        with zipfile.ZipFile(self._path_destino, 'w') as new_zip:
-            new_zip.write(self._path_origem)
-        '''
-
-
+       
     def _zip_diretorio(self):
         lista_arquivos = []
         resultado = 'erro: '
@@ -76,18 +74,10 @@ class Backup_zip:
 
             except FileNotFoundError:
                 resultado = resultado + 'FileNotFoundError'
+                Log.error('erro zip diretorio:{} erro: {}'.format(self._path_destino, 'LargeZipFile'))
             except zipfile.BadZipfile:
                 resultado = resultado + 'BadZipfile'
+                Log.error('erro zip diretorio:{} erro: {}'.format(self._path_destino, 'BadZipfile'))
             except zipfile.LargeZipFile:
-                resultado = resultado + 'LargeZipFile'
-
-            '''
-            with zipfile.ZipFile(self._path_destino, 'w') as new_zip:
-                for file in lista_arquivos:
-                    if self._os == 'Windows':
-                        arquivo = self._path_origem + '\\'+ file
-                    else:
-                        arquivo =self._path_origem + '/' + file
-
-                    new_zip.write(arquivo)
-            '''
+                resultado = resultado + 'LargeZipFile' 
+                Log.error('erro zip diretorio:{} erro: {}'.format(self._path_destino, 'LargeZipFile'))        

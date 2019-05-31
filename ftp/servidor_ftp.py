@@ -3,13 +3,13 @@ from pyftpdlib.handlers import FTPHandler
 from pyftpdlib.servers import MultiprocessFTPServer
 from threading import Thread
 from configuracao.config import Configuracao
+from util.util import Log
 
 class Gestao_ftp:
 
         def __init__(self):
             self._config = Configuracao()
             self._ftp = self._config.get_server_config().config_ftp()
-            print('ftp: {}'.format(self._ftp.host))
             self._ftp_andamento = {}
             self._ftp_finalizado = []
             self._erros = {}
@@ -25,7 +25,8 @@ class Gestao_ftp:
                 'resposta':'ftp_pronto_download',
                 'conteudo':self._info_ftp['nome']
             }
-            print('servidor_ftp:adicionar {}'.format(resposta))
+            Log.info('adicionando e iniciando thread ftp: {}'.format(info_ftp['nome']))
+
             return resposta
 
 
@@ -37,7 +38,9 @@ class Gestao_ftp:
                 self._ftp_finalizado.append(thread)
                 del self._ftp_andamento[nome_backup]
                 is_desligado = thread.is_desligado()
+                Log.info('desligando ftp: {}'.format(nome_backup))
             except KeyError:
+                Log.error('KeyError: ftp: {} nao encontrado'.format(nome_backup))
                 self._erros['KeyError'] = 'ftp {} nao encontrado'.format(nome_backup)
 
             return is_desligado
@@ -48,7 +51,6 @@ class Gestao_ftp:
         def is_rodando_ftp(self):
             is_rodando = False
             keys = self._ftp_andamento.keys()
-            print('is_rodando:keys {}'.format(keys))
             for key in keys:
                 thread = self._ftp_andamento[key]
                 is_rodando = thread.is_desligado()
@@ -69,6 +71,7 @@ class Ftp_thread(Thread):
 
     def __init__(self, config_ftp, diretorio, nome):
         Thread.__init__(self, name=nome)
+        self._nome = nome
         self._servidor_ftp = Servidor_ftp(config_ftp, diretorio)
         self._is_desligado = False
 
@@ -76,6 +79,7 @@ class Ftp_thread(Thread):
 
     def run(self):
         self._servidor_ftp.iniciar_servidor()
+        Log.info('iniciando thread ftp: {}'.format(self._nome))
 
     def get_servidor_ftp(self):
         return self._servidor_ftp
@@ -83,6 +87,7 @@ class Ftp_thread(Thread):
     def desligar_servidor(self):
         self._servidor_ftp.desligar_servidor()
         self._is_desligado = True
+        Log.info('desligando thread ftp: {}'.format(self._nome))
 
 
     def is_desligado(self):
@@ -102,11 +107,6 @@ class Servidor_ftp:
 
 
     def _config_server(self):
-        print('usuario: {}'.format(self._config.usuario))
-        print('senha: {}'.format(self._config.senha))
-        print('dir: {}'.format(self._dir))
-        print('host: {}'.format(self._config.host))
-        print('porta: {}'.format(self._config.porta))
         authorizer = DummyAuthorizer()
         authorizer.add_user(self._config.usuario, self._config.senha, self._dir, perm=self._config.permissao)
         handler = FTPHandler

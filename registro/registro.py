@@ -3,6 +3,7 @@ import datetime
 from db.modelos import Backup, Arquivo
 from util.util import Conv_data
 from configuracao.config import Configuracao
+from util.util import Log
 
 class Registro:
     def __init__(self, backup, resultado_execucao, tempo_execucao=None, arquivo=None):
@@ -35,6 +36,7 @@ class Registro:
 
         mbackup.save()
 
+
         if self._arquivo != None:
             m_arquivo = Arquivo()
             m_arquivo.nome = self._arquivo.nome
@@ -45,6 +47,7 @@ class Registro:
             m_arquivo.backup = mbackup
 
             m_arquivo.save()
+        Log.info('registrando no banco de dados')        
 
     @staticmethod
     def criar_banco():
@@ -58,3 +61,4 @@ class Registro:
         except FileNotFoundError:
             Backup.create_table()
             Arquivo.create_table()
+            Log.info('criando banco de dados')

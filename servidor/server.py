@@ -6,9 +6,7 @@ import threading
 import sys
 
 from controle.controle import Controle
-
-#filename='nbackup.log', filemode='a',
-#logging.basicConfig(filename='nbackup.log', filemode='a',level=logging.INFO, format='[%(asctime)s %(message)s]')
+from util.util import Log
 
 class Server():
 
@@ -63,7 +61,6 @@ class SelectorServer:
 
     def on_accept(self, sock, mask):
         conn, addr = self.main_socket.accept()
-        #logging.info('accepted connection from {0}'.format(addr))
         conn.setblocking(False)
 
         self.current_peers[conn.fileno()] = conn.getpeername()
@@ -77,7 +74,6 @@ class SelectorServer:
 
             if self._controle.is_data():
                 self._controle.processar_mensagem()
-                #logging.info('recebi dados de: {}'.format(conn.getpeername()))
                 conn.send(self._controle.enviar_resposta())
                 if self._controle.get_running():
                     self._set_is_running(False)
@@ -96,14 +92,13 @@ class SelectorServer:
     def close_connection(self, conn):
 
         peername = self.current_peers[conn.fileno()]
-        #logging.info('closing connection to {0}'.format(peername))
         del self.current_peers[conn.fileno()]
         self.selector.unregister(conn)
         conn.close()
 
     def serve_forever(self):
         last_report_time = time.time()
-        #logging.info('Iniciando servidor')
+        Log.info('iniciando loop de dados')
         while self._server_on_running:
 
             events = self.selector.select(timeout=0.2)
@@ -116,12 +111,10 @@ class SelectorServer:
             cur_time = time.time()
 
             if cur_time - last_report_time > 1:
-                #logging.info('Running report...')
-                #logging.info('Num active peers = {0}'.format(
-                #                len(self.current_peers)))
                 last_report_time = cur_time
 
 
     def run_server(self):
+        Log.info('iniciando thread servidor')
         self.thread = threading.Thread(target=self.serve_forever)
         self.thread.start()
