@@ -1,6 +1,6 @@
 from pyftpdlib.authorizers import DummyAuthorizer
 from pyftpdlib.handlers import FTPHandler
-from pyftpdlib.servers import MultiprocessFTPServer
+from pyftpdlib.servers import FTPServer
 from threading import Thread
 from configuracao.config import Configuracao
 from util.util import Log
@@ -111,11 +111,12 @@ class Servidor_ftp:
         authorizer.add_user(self._config.usuario, self._config.senha, self._dir, perm=self._config.permissao)
         handler = FTPHandler
         handler.authorizer = authorizer
-        self._server = MultiprocessFTPServer((self._config.host, self._config.porta), handler)
+        #self._server = MultiprocessFTPServer((self._config.host, self._config.porta), handler)
+        self._server = FTPServer((self._config.host, self._config.porta), handler)
 
 
     def iniciar_servidor(self):
-        self._server.serve_forever()
+        self._server.serve_forever(timeout=10)
 
 
     def desligar_servidor(self):
