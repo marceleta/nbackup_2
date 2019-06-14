@@ -51,6 +51,7 @@ class Controle:
 
     def processar_mensagem(self):
         data_json = json.loads(self._data)
+        print('processar_mensagem:data_json: {}'.format(data_json))
         comando = data_json['comando']
         del data_json['comando']
         
@@ -137,6 +138,7 @@ class Controle:
 
 
     def _iniciar_ftp(self, comando):
+        print('iniciar_ftp:comando: {}'.format(comando))
         if not self._gestao_ftp.is_rodando_ftp():
             resposta = self._gestao_ftp.adicionar(comando['backup'])
             Log.info('nao foi possivel iniciar ftp: {}, existe um rodando'.format(comando['backup']))
@@ -285,4 +287,5 @@ class Controle:
         return self._cmd_desligar
 
     def enviar_resposta(self):
+        print('self._resposta: {}'.format(self._resposta))
         return self._resposta.encode('utf-8')
