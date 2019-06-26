@@ -4,6 +4,7 @@ from pyftpdlib.servers import FTPServer
 from threading import Thread
 from configuracao.config import Configuracao
 from util.util import Log
+import socket
 
 class Gestao_ftp:
 
@@ -47,7 +48,7 @@ class Gestao_ftp:
 
         def get_em_andamento(self):
             return self._ftp_andamento
-
+        '''
         def is_rodando_ftp(self):
             is_rodando = False
             keys = self._ftp_andamento.keys()
@@ -56,6 +57,16 @@ class Gestao_ftp:
                 is_rodando = thread.is_desligado()
 
             return is_rodando
+        '''
+
+        def is_rodando_ftp(self):
+            rodando = False
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            if sock.connect_ex((self._ftp.host, self._ftp.porta)) == 0:
+                rodando = True
+            sock.close()
+
+            return rodando
 
         def is_erros(self):
             return (len(self._erros) > 0)
@@ -103,20 +114,30 @@ class Servidor_ftp:
         '''
         self._config = config_ftp
         self._dir = diretorio
-        self._config_server()
 
 
     def _config_server(self):
         authorizer = DummyAuthorizer()
         authorizer.add_user(self._config.usuario, self._config.senha, self._dir, perm=self._config.permissao)
         handler = FTPHandler
+
         handler.authorizer = authorizer
         #self._server = MultiprocessFTPServer((self._config.host, self._config.porta), handler)
         self._server = FTPServer((self._config.host, self._config.porta), handler)
 
 
     def iniciar_servidor(self):
-        self._server.serve_forever(timeout=10)
+        authorizer = DummyAuthorizer()
+        authorizer.add_user(self._config.usuario, self._config.senha, self._dir, perm=self._config.permissao)
+        handler = FTPHandler
+        
+        handler.authorizer = authorizer
+        #self._server = MultiprocessFTPServer((self._config.host, self._config.porta), handler)
+        try:
+            self._server = FTPServer((self._config.host, self._config.porta), handler)
+            self._server.serve_forever(timeout=5)
+        except OSError:
+            Log.error('Erro ao iniciar FTP')
 
 
     def desligar_servidor(self):
