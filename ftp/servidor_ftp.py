@@ -129,10 +129,8 @@ class Servidor_ftp:
     def iniciar_servidor(self):
         authorizer = DummyAuthorizer()
         authorizer.add_user(self._config.usuario, self._config.senha, self._dir, perm=self._config.permissao)
-        handler = FTPHandler
-        
+        handler = FTPHandler        
         handler.authorizer = authorizer
-        #self._server = MultiprocessFTPServer((self._config.host, self._config.porta), handler)
         try:
             self._server = FTPServer((self._config.host, self._config.porta), handler)
             self._server.serve_forever(timeout=5)
