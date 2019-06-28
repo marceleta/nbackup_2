@@ -35,8 +35,8 @@ class Backup_zip:
     def _zip_arquivo(self):
         resultado = 'erro: '
         try:
-            zip = zipfile.ZipFile(self._path_destino, mode='w', allowZip64=True, compress_type=zipfile.ZIP_DEFLATED)
-            zip.write(self._path_origem)
+            zip = zipfile.ZipFile(self._path_destino, mode='w', allowZip64=True)
+            zip.write(self._path_origem, compress_type=zipfile.ZIP_DEFLATED)
             Log.info('zipando arquivo: {}'.format(self._path_destino))
             zip.close()
             resultado = 'sucesso'
@@ -60,14 +60,14 @@ class Backup_zip:
                 lista_arquivos.append(file_name)
 
             try:
-                zip = zipfile.ZipFile(self._path_destino, mode='w', allowZip64=True, compress_type=zipfile.ZIP_DEFLATED)
+                zip = zipfile.ZipFile(self._path_destino, mode='w', allowZip64=True)
                 for file in lista_arquivos:
                     if self._os == 'Windows':
                         arquivo = self._path_origem + '\\' + file
                     else:
                         arquivo = self._path_origem + '/' + file
 
-                    zip.write(arquivo)
+                    zip.write(arquivo, compress_type=zipfile.ZIP_DEFLATED)
 
                 zip.close()
                 resultado = 'sucesso'
