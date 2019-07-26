@@ -1,7 +1,7 @@
 {
     "server":
         {
-            "host":"localhost",
+            "host":"10.8.0.1",
             "porta":"5000",
             "qtd_conexoes":"5",
             "ftp":{
@@ -9,7 +9,8 @@
                     "senha":"12345",
                     "permissao":"lr",
                     "host":"localhost",
-                    "porta":"5002"
+                    "porta":"5002",
+                    "servico": "FileZilla Server FTP server"
                 }
 
         }

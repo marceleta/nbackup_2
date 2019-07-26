@@ -14,11 +14,11 @@ class Config_server:
 
     @property
     def porta(self):
-        return self._porta
+        return int(self._porta)
 
     @property
-    def qtd_conecoes(self):
-        return self._qtd_conecoes
+    def qtd_conexoes(self):
+        return int(self._qtd_conecoes)
 
     def config_ftp(self):
         return self._ftp
@@ -36,6 +36,7 @@ class Config_ftp:
         self._permissao = dict['permissao']
         self._host = dict['host']
         self._porta = int(dict['porta'])
+        self._servico = dict['servico']
 
 
     @property
@@ -57,6 +58,10 @@ class Config_ftp:
     @property
     def porta(self):
         return self._porta
+
+    @property
+    def servico(self):
+        return self._servico
 
 class Usuario:
 

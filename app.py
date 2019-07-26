@@ -8,6 +8,6 @@ Registro.criar_banco()
 config = Configuracao()
 config_server = config.get_server_config()
 
-server = SelectorServer('localhost', 5000, 5)
+server = SelectorServer(config_server.host, config_server.porta, config_server.qtd_conexoes)
 server.run_server()
 Log.info('iniciando aplicacao')

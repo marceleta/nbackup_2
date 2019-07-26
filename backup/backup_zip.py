@@ -35,9 +35,11 @@ class Backup_zip:
     def _zip_arquivo(self):
         resultado = 'erro: '
         try:
+            print('inicio do zip')
             zip = zipfile.ZipFile(self._path_destino, mode='w', allowZip64=True)
             zip.write(self._path_origem, compress_type=zipfile.ZIP_DEFLATED)
             Log.info('zipando arquivo: {}'.format(self._path_destino))
+            print('fim do zip')
             zip.close()
             resultado = 'sucesso'
         except FileNotFoundError:

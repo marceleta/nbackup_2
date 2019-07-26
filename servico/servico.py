@@ -178,6 +178,9 @@ class Servico_diario:
 
     def executa_sc_nativo(self):
 
+        print('executa_sc_nativo: inicio da execucao')
+        tmp_inicio = time.time()
+
         if self._backup.tipo == 'arquivo':
             path_origem = self._get_path_abs_origem()
         else:
@@ -187,6 +190,11 @@ class Servico_diario:
                                             self._get_path_abs_backup(), self._config.os_system())
 
         resultado = self.backup_zip.zip_backup()
+
+        print('executa_sc_nativo: fim da execucao')
+        tmp_final = time.time()
+        print('tempo total: {}'.format(str(tmp_final - tmp_inicio)))
+        
 
         return resultado   
 

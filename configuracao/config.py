@@ -53,9 +53,9 @@ class Configuracao:
 
     def _config_path(self):
         if self.os_system() == 'Windows':
-            self._path = 'c:/nbackup/'
+            self._path = '/nbackup/'
         else:
-            self._path = '/home/marcelo/python/nbackup/'
+            self._path = '/nbackup/'
 
     def get_path(self):
         return self._path

@@ -8,6 +8,7 @@ from util.util import Conv_data, Conversor, Gerar_md5, Log
 from registro.registro import Registro
 from ftp.servidor_ftp import Gestao_ftp
 from db.modelos import Backup as Backup_db, Arquivo
+from ftp.ftp import Ftp
 
 
 class Controle:
@@ -19,6 +20,7 @@ class Controle:
         self._data = bytes()
         self._config = Configuracao()
         self._gestao_ftp = Gestao_ftp()
+        self.ftp = Ftp()
         self._bkp_conversor = Backup_dict()
         self._loop_controle = True
         self._thread_servico = {}
@@ -137,22 +139,45 @@ class Controle:
         return json.dumps(resposta)
 
 
+#    def _iniciar_ftp(self, comando):
+#        print('iniciar_ftp:comando: {}'.format(comando))
+#        if not self._gestao_ftp.is_rodando_ftp():
+#            resposta = self._gestao_ftp.adicionar(comando['backup'])
+#            Log.info('nao foi possivel iniciar ftp: {}, existe um rodando'.format(comando['backup']))
+#        else:
+#            resposta = {
+#                'resposta':'ftp_rodando',
+#                'conteudo':'ftp_ocupado'
+#            }
+#            Log.info('iniciando ftp {}.'.format(comando['backup']))        
+#
+#        return json.dumps(resposta)
+
     def _iniciar_ftp(self, comando):
-        print('iniciar_ftp:comando: {}'.format(comando))
-        if not self._gestao_ftp.is_rodando_ftp():
-            resposta = self._gestao_ftp.adicionar(comando['backup'])
-            Log.info('nao foi possivel iniciar ftp: {}, existe um rodando'.format(comando['backup']))
-        else:
-            resposta = {
-                'resposta':'ftp_rodando',
-                'conteudo':'ftp_ocupado'
+        self.ftp.iniciar()
+        resposta = {
+                'resposta':'ftp_pronto_download'
             }
-            Log.info('iniciando ftp {}.'.format(comando['backup']))        
+        Log.info('iniciando ftp {}.'.format(comando['backup']))        
 
         return json.dumps(resposta)
 
+#    def _fechar_ftp(self, comando):
+#        is_desligado = self._gestao_ftp.desligar(comando['nome'])
+#        Log.info('desligando ftp: {}.'.format(comando['nome']))
+#        str_id = comando['id_arquivo']
+#        id = int(str_id)
+#        Arquivo.set_enviado(id)
+#        Log.info('salvando alteracoes no banco de dados, arquivo id: {}'.format(str_id))
+#
+#        resposta = {'resposta':'ok',
+#                    'conteudo':'download arquivo executado com sucesso'
+#                    }
+#
+#        return json.dumps(resposta)
+
     def _fechar_ftp(self, comando):
-        is_desligado = self._gestao_ftp.desligar(comando['nome'])
+        self.ftp.parar()
         Log.info('desligando ftp: {}.'.format(comando['nome']))
         str_id = comando['id_arquivo']
         id = int(str_id)
@@ -164,6 +189,8 @@ class Controle:
                     }
 
         return json.dumps(resposta)
+
+
 
 
     def _iniciar_thread_controle(self):
@@ -237,6 +264,7 @@ class Controle:
         self._thread_servico[serv.get_nome()] = thread
         thread.set_inicio_thread(time.time())
         thread.start()
+        print('thread iniciado: {}'.format(thread.get_nome()))
 
     def _verifica_thread_ativos(self):
         while self._loop_controle:
@@ -244,11 +272,12 @@ class Controle:
             for key in lista_thread_ativos:
                 thread = self._thread_servico.get(key)
                 if not thread.is_alive():
+                    print('backup finalizado: {}'.format(thread.get_nome()))
                     thread.set_final_thread(time.time())
                     self._threads_finalizados[thread.get_nome()] = thread
                     del self._thread_servico[key]
 
-            time.sleep(600)
+            time.sleep(60)
 
     def _registar_servicos_finalizados(self):
         while self._loop_controle:
@@ -260,7 +289,9 @@ class Controle:
                 backup = servico.get_backup()
                 arq = None
                 if servico.verifica_backup_existe():
+                    print('_registar_servicos_finalizados:if:')
                     arq = servico.get_info_arquivo_backup()
+                print('_registar_servicos_finalizados:fim if:')
 
                 self._registro = Registro(backup, servico.get_resultado(), tempo_execucao=t_execucao, arquivo=arq)
                 self._registro.registrar()
